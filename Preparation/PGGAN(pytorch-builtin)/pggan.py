@@ -11,32 +11,16 @@ use_gpu = True if torch.cuda.is_available() else False
 
 # trained on high-quality celebrity faces "celebA" dataset
 # this model outputs 512 x 512 pixel images
-model_high_res = torch.hub.load('facebookresearch/pytorch_GAN_zoo:hub',
+model = torch.hub.load('facebookresearch/pytorch_GAN_zoo:hub',
                         'PGAN', model_name='celebAHQ-512',
                         pretrained=True, useGPU=use_gpu)
 
-# this model outputs 256 x 256 pixel images
-model_middle_res = torch.hub.load('facebookresearch/pytorch_GAN_zoo:hub',
-                        'PGAN', model_name='celebAHQ-256',
-                        pretrained=True, useGPU=use_gpu)
-
-# this model outputs 128 x 128 pixel images
-model_low_res = torch.hub.load('facebookresearch/pytorch_GAN_zoo:hub',
-                        'PGAN', model_name='celeba',
-                        pretrained=True, useGPU=use_gpu)
-
-# this model outputs 128 x 128 pixel images
-model_DTD = torch.hub.load('facebookresearch/pytorch_GAN_zoo:hub',
-                        'PGAN', model_name='DTD',
-                        pretrained=True, useGPU=use_gpu)
-
-
-# input noise from a latent space is N * 521, where N = # of output images
+# input noise from a latent space is N * 512, where N = # of output images
 # presumably this will allow the system to carry out the process in parallel for each image
 num_images = 1
-noise, _ = model_high_res.buildNoiseData(num_images) 
+noise, _ = model.buildNoiseData(num_images) 
 with torch.no_grad():
-    generated_images = model_high_res.test(noise)
+    generated_images = model.test(noise)
 
 torch.save(generated_images, 'generated_images')
 save_image(generated_images[0], 'generated.png')
