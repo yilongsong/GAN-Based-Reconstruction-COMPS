@@ -12,6 +12,9 @@ import torch.nn.functional as F
 
 from collections import OrderedDict
 
+error_min = -1
+error_max = 1
+
 
 class PixelNormLayer(nn.Module):
     def __init__(self):
@@ -105,4 +108,4 @@ class Generator(nn.Module):
     def forward(self, x):
         x = self.features(x)
         x = self.output(x)
-        return x
+        return torch.unsqueeze(((x[0]-error_min)/(error_max-error_min)), 0)

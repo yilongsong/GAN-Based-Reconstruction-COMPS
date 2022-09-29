@@ -14,7 +14,7 @@ z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
 z = torch.autograd.Variable(z_init, requires_grad = True) # this step is required in the future because 
 # we need gradients to be computed for z_init
 
-Gz = torch.unsqueeze(((G(z)[0]+1)/2), 0)
+Gz = G(z)
 AGz1 = A.guassian_A(Gz)
 AGz2 = A.bicubic_downsample_A(Gz, 1/8)
 
