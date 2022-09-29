@@ -1,9 +1,7 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
 This PyTorch implementation is based on the Theano/Lasagne implementation of
 the "Progressive Growing of GANs" proposed by tkarras:
-https://github.com/tkarras/progressive_growing_of_gans
+    https://github.com/tkarras/progressive_growing_of_gans
 
 Please refer to Reference in ReadMe
 """

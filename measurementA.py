@@ -12,13 +12,10 @@ class A():
         # assign self.A = lambda image: "operation"
         pass
 
-    def guassian_A():
-        '''
-        mu, sigma = 0, 1/np.sqrt(1024)
-        A = np.random.normal(mu, sigma, (1024, 1024, 3))
-        apply_A = lambda img : np.multiply(A, img)
-        '''
-        pass
+    def guassian_A(Gz) -> torch.tensor:
+        A = torch.normal(mean=0.0, std=1/np.sqrt(Gz.shape[2]), size=(1,3,1024,1024)) 
+        return torch.multiply(A, Gz)
 
-    def bicubic_downsample_A():
-        pass
+    def bicubic_downsample_A(Gz, scale) -> torch.tensor:
+        return torch.nn.functional.interpolate(Gz, scale_factor=scale, mode='bicubic')
+        
