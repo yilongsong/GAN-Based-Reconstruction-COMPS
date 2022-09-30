@@ -19,7 +19,7 @@ class ImageAdaptiveGenerator():
     CSGM_optimizer (string): optimizer used: ADAM, SGD, etc.
     x_path (string): path of image x (original image)
     A_type (string): type of matrix A ('Gaussian', 'Bicubic_Downsample', etc.)
-    noise_level (int): noise level 
+    noise_level (int): noise level
     scale (float): value of a fraction in the form of 1/x where x > 1
     '''
     def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, scale=1/8):
@@ -28,7 +28,7 @@ class ImageAdaptiveGenerator():
             self.G = Generator()
             self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth'))
             self.G.eval() # turn off weights modification in the inference time
-        
+
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
         self.z = torch.autograd.Variable(z_init, requires_grad = True)
@@ -43,12 +43,13 @@ class ImageAdaptiveGenerator():
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
         else:
             return
-        
+
         # initialize y
         convert_to_tensor = transforms.ToTensor()
         x_PIL = Image.open(x_path)
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
         self.y = self.A(self.x)
+        self.xhat = self.G.forward(self.z)
 
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
         # define the cost function
@@ -56,8 +57,11 @@ class ImageAdaptiveGenerator():
         # define the optimizer
         if self.CSGM_optimizer == "SGD":
             optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
-        else:
-            return
+        elif self.CSGM_optimizer == "ADAM":
+            optimizer = torch.optim.ADAM(params=[self.z])
+
+        #original = self.z.detach().clone()
+        #print(original)
 
         # CSGM training starts here
         for itr in range(csgm_iteration_number):
@@ -67,21 +71,28 @@ class ImageAdaptiveGenerator():
             loss = cost(self.y, self.A(Gz))
             # back-propagation
             loss.backward()
-            # update z 
+            # update z
             optimizer.step()
             # clear gradient in optimizer
             optimizer.zero_grad()
             # print out each 100th iterations
-            if itr % 100 == 0:
+            if itr % 2 == 0:
                 print(f"iteration {itr}, loss = {loss:.10f}")
-             
+                #print(torch.sum(torch.abs(self.z - original)))
         CSGM_img = self.G(self.z)
         return CSGM_img
-    
+
     def IAGAN(self):
-        #optimizes z and theta
-        pass 
+        """
+        self.G.features = self.G.features.(requires_grad = True)
+        self.G.output = self.G.output.(requires_grad = True)
+        CSGM_img = self.CSGM(self, csgm_iteration_number, csgm_learning_rate)
+        return CSGM_img"""
+        return
 
     def BP(self):
-        #enforce compliance 
-        pass
+        #enforce compliance
+        self.xhat = self.G.forward(self.z)
+        Adagger = np.multiply(np.transpose(A), np.linalg.inv((np.multiply(A,np.transpose(A)))))
+        self.xhat = np.add(np.multiply(Adagger,(np.subtract(self.y, np.multiply(A,self.xhat)))), self.x)
+        return self.xhat
