@@ -7,9 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class A():
-    def __init__(self, matrix_type):
-        # depending on type
-        # assign self.A = lambda image: "operation"
+    def __init__(self):
         pass
 
     def guassian_A(img) -> torch.tensor:
@@ -19,3 +17,5 @@ class A():
     def bicubic_downsample_A(img, scale) -> torch.tensor:
         return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic')
         
+    def apply_pseudo_inverse_A(img, y) -> torch.tensor:
+        pass
