@@ -1,8 +1,8 @@
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 
 from trainer import Trainer
-from config import get_config
+from model import get_config
 from data_loader import get_loader
 from utils import prepare_dirs_and_logger, save_config
 
