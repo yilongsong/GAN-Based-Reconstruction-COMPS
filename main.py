@@ -11,8 +11,8 @@ def showImage(img):
         return image
 
 def main():
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/000168.jpg', A_type="Bicubic_Downsample")
-    CSGM_img, org = generator.CSGM(50, 0.1)
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', A_type="Bicubic_Downsample")
+    CSGM_img, org = generator.CSGM(2000, 0.1)
     showImage(CSGM_img)
     showImage(org)
     #generator.BP()
