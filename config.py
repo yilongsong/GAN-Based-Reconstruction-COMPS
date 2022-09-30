@@ -33,6 +33,9 @@ class ImageAdaptiveGenerator():
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
         self.z = torch.autograd.Variable(z_init, requires_grad = True)
 
+        # initialize CSGM optimizer
+        self.CSGM_optimizer = CSGM_optimizer
+
         # initialize A
         if A_type == 'Gaussian':
             self.A = A.guassian_A
@@ -51,8 +54,10 @@ class ImageAdaptiveGenerator():
         # define the cost function
         cost = nn.MSELoss()
         # define the optimizer
-        optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
-
+        if self.CSGM_optimizer = "SGD":
+            optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
+        else:
+            pass
 
         # CSGM training starts here
         for itr in range(csgm_iteration_number):
@@ -89,8 +94,8 @@ def showImage(img):
         return image
         
 def main():
-    generator = ImageAdaptiveGenerator('PGGAN', "SGD", './Images/CelebA_HQ/000168.jpg', "Gaussian")
-    CSGM_img2 = generator.CSGM(500, 0.1)
+    generator = ImageAdaptiveGenerator('PGGAN', "SGD", './Images/CelebA_HQ/000168.jpg', "Bicubic_Downsampling")
+    CSGM_img2 = generator.CSGM(2000, 0.01)
     showImage(CSGM_img2)
 
 main()
