@@ -16,14 +16,13 @@ from PGGAN import Generator
 class ImageAdaptiveGenerator():
     '''
     GAN_type (string): type of pretrained GAN to use
-    CSGM_iteration_number (int): number of CSGM_iterations
     CSGM_optimizer (string): optimizer used: ADAM, SGD, etc.
     x_path (string): path of image x (original image)
     A_type (string): type of matrix A ('Gaussian', 'Bicubic_Downsample', etc.)
     noise_level (int): noise level 
     scale (float): value of a fraction in the form of 1/x where x > 1
     '''
-    def __init__(self, GAN_type, CSGM_iteration_number, CSGM_optimizer, x_path, A_type, scale=1/8):
+    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, scale=1/8):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
@@ -33,9 +32,6 @@ class ImageAdaptiveGenerator():
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
         self.z = torch.autograd.Variable(z_init, requires_grad = True)
-
-        # CSGM step number
-        self.CSGM_iteration_number = CSGM_iteration_number
 
         # initialize A
         if A_type == 'Gaussian':
@@ -49,19 +45,21 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
         self.y = self.A(self.x)
 
-    def CSGM(self, csgm_learning_rate):
+    def CSGM(self, csgm_iteration_number, csgm_learning_rate):
         CSGM_img1 = self.G(self.z)
+        showImage(CSGM_img1)
         # define the cost function
         cost = nn.MSELoss()
         # define the optimizer
-        optimizer = torch.optim.SGD(params=self.z, lr=csgm_learning_rate)
+        optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
 
-        # CSGM starts here
-        for itr in range(self.CSGM_iteration_number):
+
+        # CSGM training starts here
+        for itr in range(csgm_iteration_number):
             # generate an image from the current z
-            Gz = self.G(self.z)
+            Gz = self.G.forward(self.z)
             # create the loss function
-            loss = cost(self.A(Gz), self.y)
+            loss = cost(self.y, self.A(Gz))
             # back-propagation
             loss.backward()
             # update z 
@@ -73,7 +71,8 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}")
              
         CSGM_img2 = self.G(self.z)
-        return CSGM_img1, CSGM_img2
+        showImage(CSGM_img1)
+        return CSGM_img2
     
     def IAGAN(self):
         #optimizes z and theta
@@ -90,9 +89,8 @@ def showImage(img):
         return image
         
 def main():
-    generator = ImageAdaptiveGenerator('PGGAN', 5, "SGD", './Images/CelebA_HQ/000168.jpg', "Gaussian")
-    CSGM_img1, CSGM_img2 = generator.CSGM(0.01)
-    showImage(CSGM_img1)
+    generator = ImageAdaptiveGenerator('PGGAN', "SGD", './Images/CelebA_HQ/000168.jpg', "Gaussian")
+    CSGM_img2 = generator.CSGM(500, 0.1)
     showImage(CSGM_img2)
 
 main()
