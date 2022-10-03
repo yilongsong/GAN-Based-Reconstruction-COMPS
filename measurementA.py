@@ -20,3 +20,12 @@ class A():
     # equivalent to A_dag(img)
     #def bicubic_upsample_A(img, scale) -> torch.tensor:
     #    return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic')
+
+    def cv_bicubic_downsample_A(img):
+        np_img = img.numpy()[0]
+        resized = np.zeros((3,512,512))
+        for ch in range(3):
+            resized_ch = cv2.resize(np_img[ch], dsize=(512,512), interpolation=cv2.INTER_CUBIC)
+            resized[ch] = resized_ch
+        img = torch.from_numpy(resized)
+        return img.unsqueeze(0)

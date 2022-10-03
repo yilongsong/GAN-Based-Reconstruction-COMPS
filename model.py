@@ -23,7 +23,7 @@ class ImageAdaptiveGenerator():
     noise_level (int): noise level
     scale (float): value of a fraction in the form of 1/x where x > 1
     '''
-    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/8):
+    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/16):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
@@ -47,6 +47,8 @@ class ImageAdaptiveGenerator():
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
+        elif A_type == 'OpenCv_Downsample':
+            self.A = lambda I: A.cv_bicubic_downsample_A(I)
         else:
             return
 

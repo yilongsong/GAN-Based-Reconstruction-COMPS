@@ -12,8 +12,12 @@ def showImage(img):
 
 def main():
     # Their method
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', \
-                                        A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001349.jpg', \
+                                        A_type="OpenCv_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
+    
+    showImage(generator.x)
+    showImage(generator.y)
+    
     # CSGM
     CSGM_img, original1 = generator.CSGM(csgm_iteration_number=100, csgm_learning_rate=0.1)
     showImage(original1)
@@ -27,6 +31,8 @@ def main():
     # BP
     BP_img = generator.BP()
     showImage(BP_img)
+
+    # We need to get the original weights every time we run IA step!!!!!!
 
     # # Our method
     # generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', \
