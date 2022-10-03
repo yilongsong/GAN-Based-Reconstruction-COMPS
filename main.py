@@ -11,6 +11,7 @@ def showImage(img):
         return image
 
 def main():
+    # Their method
     generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', \
                                         A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     # CSGM
@@ -27,6 +28,20 @@ def main():
     BP_img = generator.BP()
     showImage(BP_img)
 
+
+
+    # Our method
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', \
+                                        A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
+    # IA
+    IA_img, original2 = generator.IA(IA_iteration_number=1, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    showImage(original2)
+    showImage(IA_img)
+
+    # BP
+    BP_img = generator.BP()
+    showImage(BP_img)
+
 if __name__ == '__main__':
     main()
