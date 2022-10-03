@@ -11,7 +11,7 @@ def showImage(img):
         return image
 
 def main():
-    # Their method
+    # Hussein et al.'s method
     generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001349.jpg', \
                                         A_type="OpenCv_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
