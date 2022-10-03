@@ -13,6 +13,7 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 from measurementA import A
 from PGGAN import Generator
+from main import saveImage
 
 class ImageAdaptiveGenerator():
     '''
@@ -47,8 +48,9 @@ class ImageAdaptiveGenerator():
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
-        elif A_type == 'OpenCv_Downsample':
-            self.A = lambda I: A.cv_bicubic_downsample_A(I)
+        elif A_type == 'PIL_Bicubic_Downsample':
+            self.A = lambda I: A.PIL_bicubic_downsample_A(I, scale, 1024)
+            self.A_dag = lambda I: A.PIL_bicubic_downsample_A(I, 1/scale, 64)
         else:
             return
 
@@ -85,7 +87,9 @@ class ImageAdaptiveGenerator():
             # print out each 100th iterations
             if itr % 10 == 0:
                 print(f"iteration {itr}, loss = {loss:.10f}")
-                #print(torch.sum(torch.abs(self.z - original)))
+            # save images
+            if itr % 100 == 0:
+                saveImage(self.G(self.z), "csgm_"+str(itr))
         CSGM_img = self.G(self.z)
         return CSGM_img, original
 
@@ -122,6 +126,9 @@ class ImageAdaptiveGenerator():
             # print out each 100th iterations
             if itr % 10 == 0:
                 print(f"iteration {itr}, loss = {loss:.10f}") 
+            # save images
+            if itr % 100 == 0:
+                saveImage(self.G(self.z), "ia_"+str(itr))
         IA_img = self.G(self.z)
         return IA_img, original 
 

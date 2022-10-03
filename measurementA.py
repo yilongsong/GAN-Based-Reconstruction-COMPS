@@ -1,10 +1,15 @@
 '''
     Where we implement measurement metrecies A
+
+    https://discuss.pytorch.org/t/pytorch-pil-to-tensor-and-vice-versa/6312
 '''
 import torch
 import cv2 
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
+
+from torchvision import transforms
 
 class A():
     def __init__(self):
@@ -15,17 +20,4 @@ class A():
         return torch.multiply(A, img)
 
     def bicubic_downsample_A(img, scale) -> torch.tensor:
-        return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic') 
-    
-    # equivalent to A_dag(img)
-    #def bicubic_upsample_A(img, scale) -> torch.tensor:
-    #    return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic')
-
-    def cv_bicubic_downsample_A(img):
-        np_img = img.numpy()[0]
-        resized = np.zeros((3,512,512))
-        for ch in range(3):
-            resized_ch = cv2.resize(np_img[ch], dsize=(512,512), interpolation=cv2.INTER_CUBIC)
-            resized[ch] = resized_ch
-        img = torch.from_numpy(resized)
-        return img.unsqueeze(0)
+        return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic', align_corners=False, antialias=True) 
