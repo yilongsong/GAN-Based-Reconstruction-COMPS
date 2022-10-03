@@ -13,7 +13,7 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 from measurementA import A
 from PGGAN import Generator
-from main import saveImage
+from image_saver import saveImage
 
 class ImageAdaptiveGenerator():
     '''
@@ -89,7 +89,7 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}")
             # save images
             if itr % 100 == 0:
-                saveImage(self.G(self.z), "csgm_"+str(itr))
+                self.saveImage(self.G(self.z), "csgm_"+str(itr))
         CSGM_img = self.G(self.z)
         return CSGM_img, original
 
@@ -128,7 +128,7 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}") 
             # save images
             if itr % 100 == 0:
-                saveImage(self.G(self.z), "ia_"+str(itr))
+                self.saveImage(self.G(self.z), "ia_"+str(itr))
         IA_img = self.G(self.z)
         return IA_img, original 
 
