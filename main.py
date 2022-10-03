@@ -11,11 +11,22 @@ def showImage(img):
         return image
 
 def main():
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', A_type="Bicubic_Downsample")
-    CSGM_img, org = generator.CSGM(2000, 0.1)
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/028580.jpg', \
+                                        A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
+    # CSGM
+    CSGM_img, original1 = generator.CSGM(csgm_iteration_number=1, csgm_learning_rate=0.1)
+    showImage(original1)
     showImage(CSGM_img)
-    showImage(org)
-    #generator.BP()
 
+    # IA
+    IA_img, original2 = generator.IA(IA_iteration_number=1, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    showImage(original2)
+    showImage(IA_img)
+
+    # BP
+    BP_img = generator.BP()
+    showImage(BP_img)
+
+    
 if __name__ == '__main__':
     main()

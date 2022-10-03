@@ -1,3 +1,4 @@
+from pickletools import optimize
 import torch
 import cv2 as cv
 import numpy as np
@@ -22,7 +23,7 @@ class ImageAdaptiveGenerator():
     noise_level (int): noise level
     scale (float): value of a fraction in the form of 1/x where x > 1
     '''
-    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, scale=1/8):
+    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/8):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
@@ -36,11 +37,16 @@ class ImageAdaptiveGenerator():
         # initialize CSGM optimizer
         self.CSGM_optimizer = CSGM_optimizer
 
+        #initialize IA optimizer 
+        self.IA_optimizer_z = IA_optimizer_z
+        self.IA_optimizer_G = IA_optimizer_G
+
         # initialize A
         if A_type == 'Gaussian':
             self.A = A.guassian_A
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
+            self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
         else:
             return
 
@@ -59,14 +65,11 @@ class ImageAdaptiveGenerator():
         elif self.CSGM_optimizer == "ADAM":
             optimizer = torch.optim.Adam(params=[self.z], lr=csgm_learning_rate)
 
-        #original = self.z.detach().clone()
-        #print(original)
-        original = None
-
         # CSGM training starts here
         for itr in range(csgm_iteration_number):
             # generate an image from the current z
             Gz = self.G(self.z)
+            # save the initial image fron GAN
             if itr == 0:
                 original = Gz
             # create the loss function
@@ -84,18 +87,44 @@ class ImageAdaptiveGenerator():
         CSGM_img = self.G(self.z)
         return CSGM_img, original
 
-    # def IAGAN(self):
-    #     """
-    #     self.G.features = self.G.features.(requires_grad = True)
-    #     self.G.output = self.G.output.(requires_grad = True)
-    #     CSGM_img = self.CSGM(self, csgm_iteration_number, csgm_learning_rate)
-    #     return CSGM_img
-    #     """
-    #     return
+    def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
+        # define the cost function
+        cost = nn.MSELoss()
+        # define the optimizer for z (as of now, ADAM only)
+        if self.IA_optimizer_z == "ADAM":
+            optimizer_z = torch.optim.Adam(params=[self.z], lr=IA_z_learning_rate)
+        # define the optimizer for G (as of now ADAM only)
+        if self.IA_optimizer_G == "ADAM":
+            optimizer_G = torch.optim.Adam(params=self.G.parameters(), lr=IA_G_learning_rate)
 
-    # def BP(self):
-    #     #enforce compliance
-    #     xhat = self.G(self.z)
-    #     A_dag = torch.matmul(torch.t(A), torch.inverse(torch.matmul(A,torch.t(A))))
-    #     xhat = torch.add(torch.matmul(A_dag,(torch.sub(self.y, torch.matmul(A, xhat)))), xhat)
-    #     return xhat
+        # unfreeze G's params (maybe)
+
+        # IA steps here
+        # CSGM training starts here
+        for itr in range(IA_iteration_number):
+            # generate an image from the current z
+            Gz = self.G(self.z)
+            # save the initial image fron GAN
+            if itr == 0:
+                original = Gz
+            # create the loss function
+            loss = cost(self.y, self.A(Gz))
+            # back-propagation
+            loss.backward()
+            # update z and G's params
+            optimizer_z.step()
+            optimizer_G.step()
+            # clear gradient in optimizer
+            optimizer_z.zero_grad()
+            optimizer_G.zero_grad()
+            # print out each 100th iterations
+            if itr % 10 == 0:
+                print(f"iteration {itr}, loss = {loss:.10f}") 
+        IA_img = self.G(self.z)
+        return IA_img, original 
+
+    def BP(self):
+        #enforce compliance
+        xhat = self.G(self.z)
+        xhat = torch.add(self.A_dag((torch.sub(self.y, self.A(xhat)))), xhat)
+        return xhat

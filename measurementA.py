@@ -15,7 +15,8 @@ class A():
         return torch.multiply(A, img)
 
     def bicubic_downsample_A(img, scale) -> torch.tensor:
-        return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic')
-        
-    def apply_pseudo_inverse_A(img, y) -> torch.tensor:
-        pass
+        return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic') 
+    
+    # equivalent to A_dag(img)
+    #def bicubic_upsample_A(img, scale) -> torch.tensor:
+    #    return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic')
