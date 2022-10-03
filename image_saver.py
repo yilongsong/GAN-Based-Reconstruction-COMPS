@@ -1,8 +1,12 @@
+from genericpath import exists
+import os
+
 from torchvision import transforms
 from PIL import Image
 
-def saveImage(img, file_name):
+def saveImage(img, file_name, format='.png'):
         convert_to_PIL = transforms.ToPILImage()
         image = convert_to_PIL(img[0])
-        image.save("./generated_images/"+file_name)
+        path = './generated_images/result1/'
+        image.save(path+file_name+format)
         return image

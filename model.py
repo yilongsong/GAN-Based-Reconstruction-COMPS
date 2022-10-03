@@ -90,7 +90,7 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}")
             # save images
             if itr % 100 == 0:
-                self.saveImage(self.G(self.z), "csgm_"+str(itr))
+                saveImage(self.G(self.z), "CSGM_"+str(itr))
         CSGM_img = self.G(self.z)
         return CSGM_img, original
 
@@ -129,7 +129,7 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}") 
             # save images
             if itr % 100 == 0:
-                self.saveImage(self.G(self.z), "ia_"+str(itr))
+                saveImage(self.G(self.z), "IA_"+str(itr))
         IA_img = self.G(self.z)
         return IA_img, original 
 

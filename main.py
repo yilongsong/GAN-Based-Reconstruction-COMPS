@@ -10,21 +10,21 @@ def main():
     generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001349.jpg', \
                                         A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
-    saveImage(generator.x, "target_original.png")
-    saveImage(generator.y, "target_downsampled.png")
+    saveImage(generator.x, "target_original")
+    saveImage(generator.y, "target_downsampled")
     
     # CSGM
     CSGM_img, original1 = generator.CSGM(csgm_iteration_number=1000, csgm_learning_rate=0.1)
-    saveImage(original1, "csgm_orginal,png")
-    saveImage(CSGM_img, "csgm_optimized.png")
+    saveImage(original1, "csgm_orginal")
+    saveImage(CSGM_img, "csgm_optimized")
 
     # IA
     IA_img, original2 = generator.IA(IA_iteration_number=200, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
-    saveImage(IA_img, "ia_optimized.png")
+    saveImage(IA_img, "ia_optimized")
 
     # BP
     BP_img = generator.BP()
-    saveImage(BP_img, "bp_optimized.png")
+    saveImage(BP_img, "bp_optimized")
 
     # We need to get the original weights every time we run IA step!!!!!!
 
