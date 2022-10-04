@@ -21,7 +21,8 @@ class ImageAdaptiveGenerator():
     CSGM_optimizer (string): optimizer used: ADAM, SGD, etc.
     x_path (string): path of image x (original image)
     A_type (string): type of matrix A ('Gaussian', 'Bicubic_Downsample', etc.)
-    noise_level (int): noise level
+    IA_optimizer_z (string): optimizer used to optimize z
+    IA_optimizer_G (string): optimizer used to optimize G
     scale (float): value of a fraction in the form of 1/x where x > 1
     '''
     def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/16):
