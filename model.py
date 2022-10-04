@@ -59,6 +59,10 @@ class ImageAdaptiveGenerator():
         self.y = self.A(self.x)
 
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
+        # arrays that store data from CSGM
+        CSGM_itr = [i for i in range(csgm_iteration_number)]
+        CSGM_loss = []
+    
         # define the cost function
         cost = nn.MSELoss()
         # define the optimizer
@@ -76,6 +80,7 @@ class ImageAdaptiveGenerator():
                 original = Gz
             # create the loss function
             loss = cost(self.y, self.A(Gz))
+            CSGM_loss.append(loss.item())
             # back-propagation
             loss.backward()
             # update z
@@ -89,9 +94,13 @@ class ImageAdaptiveGenerator():
             if itr % 100 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr))
         CSGM_img = self.G(self.z)
-        return CSGM_img, original
+        return CSGM_img, original, [CSGM_itr, CSGM_loss]
 
     def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
+        # arrays that store data from IA
+        IA_itr = [i for i in range(IA_iteration_number)]
+        IA_loss = []
+
         # define the cost function
         cost = nn.MSELoss()
         # define the optimizer for z (as of now, ADAM only)
@@ -113,6 +122,7 @@ class ImageAdaptiveGenerator():
                 original = Gz
             # create the loss function
             loss = cost(self.y, self.A(Gz))
+            IA_loss.append(loss.item())
             # back-propagation
             loss.backward()
             # update z and G's params
@@ -128,7 +138,7 @@ class ImageAdaptiveGenerator():
             if itr % 100 == 0:
                 saveImage(self.G(self.z), "IA_"+str(itr))
         IA_img = self.G(self.z)
-        return IA_img, original 
+        return IA_img, original, [IA_itr, IA_loss]
 
     def BP(self):
         #enforce compliance
