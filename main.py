@@ -7,24 +7,24 @@ from image_saver import saveImage
 
 def main():
     # Hussein et al.'s method
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001349.jpg', \
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/004288.jpg', \
                                         A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
-    saveImage(generator.x, "target_original")
-    saveImage(generator.y, "target_downsampled")
+    saveImage(generator.x, "original")
+    saveImage(generator.y, "downsampled")
     
-    # CSGM
-    CSGM_img, original1 = generator.CSGM(csgm_iteration_number=1000, csgm_learning_rate=0.1)
-    saveImage(original1, "csgm_orginal")
-    saveImage(CSGM_img, "csgm_optimized")
+    # # CSGM
+    CSGM_img, original1 = generator.CSGM(csgm_iteration_number=1800, csgm_learning_rate=0.1)
+    saveImage(original1, "CSGM_orginal")
+    saveImage(CSGM_img, "CSGM_optimized")
 
-    # IA
-    IA_img, original2 = generator.IA(IA_iteration_number=200, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
-    saveImage(IA_img, "ia_optimized")
+    # # IA
+    IA_img, original2 = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    saveImage(IA_img, "IA_optimized")
 
     # BP
     BP_img = generator.BP()
-    saveImage(BP_img, "bp_optimized")
+    saveImage(BP_img, "BP_optimized")
 
     # We need to get the original weights every time we run IA step!!!!!!
 

@@ -7,6 +7,6 @@ from PIL import Image
 def saveImage(img, file_name, format='.png'):
         convert_to_PIL = transforms.ToPILImage()
         image = convert_to_PIL(img[0])
-        path = './generated_images/result1/'
+        path = './generated_images/result4/'
         image.save(path+file_name+format)
         return image

@@ -48,9 +48,6 @@ class ImageAdaptiveGenerator():
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
-        elif A_type == 'PIL_Bicubic_Downsample':
-            self.A = lambda I: A.PIL_bicubic_downsample_A(I, scale, 1024)
-            self.A_dag = lambda I: A.PIL_bicubic_downsample_A(I, 1/scale, 64)
         else:
             return
 
