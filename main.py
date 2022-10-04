@@ -8,7 +8,7 @@ from plot import savePlot
 
 def main():
     # Hussein et al.'s method
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/043818.jpg', \
+    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001743.jpg', \
                                         A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
     saveImage(generator.x, "original")

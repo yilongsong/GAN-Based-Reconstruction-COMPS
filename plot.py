@@ -9,5 +9,5 @@ def savePlot(CSGM_data, IA_data):
     plt.xlabel('iteration #', fontsize=14)
     plt.ylabel('loss', fontsize=14)
     plt.grid(True)
-    path = './generated_images/result5/result.png'
+    path = './generated_images/result6/result.png'
     plt.savefig(path)
