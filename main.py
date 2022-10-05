@@ -7,8 +7,8 @@ from image_saver import saveImage
 from plot import savePlot
 
 def main():
+    folder_name = 'result'
     # Hussein et al.'s method
-    folder_name = 'test'
     generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001743.jpg', \
                                         A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
     
