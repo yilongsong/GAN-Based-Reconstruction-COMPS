@@ -24,8 +24,9 @@ class ImageAdaptiveGenerator():
     IA_optimizer_z (string): optimizer used to optimize z
     IA_optimizer_G (string): optimizer used to optimize G
     scale (float): value of a fraction in the form of 1/x where x > 1
+    result_folder_name: name of the folder in generated_images to store results
     '''
-    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/16):
+    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/16, result_folder_name="result"):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
@@ -58,7 +59,10 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
         self.y = self.A(self.x)
 
+        self.result_folder_name = result_folder_name
+
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
+        print("Launching CSGM optimization:")
         # arrays that store data from CSGM
         CSGM_itr = [i for i in range(csgm_iteration_number)]
         CSGM_loss = []
@@ -92,11 +96,12 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr}, loss = {loss:.10f}")
             # save images
             if (itr+1) % 100 == 0:
-                saveImage(self.G(self.z), "CSGM_"+str(itr+1))
+                saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
         CSGM_img = self.G(self.z)
         return CSGM_img, original, [CSGM_itr, CSGM_loss]
 
     def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
+        print("Launching IA optimization:")
         # arrays that store data from IA
         IA_itr = [i for i in range(IA_iteration_number)]
         IA_loss = []
@@ -136,7 +141,7 @@ class ImageAdaptiveGenerator():
                 print(f"iteration {itr+1}, loss = {loss:.10f}") 
             # save images
             if (itr+1) % 100 == 0:
-                saveImage(self.G(self.z), "IA_"+str(itr+1))
+                saveImage(self.G(self.z), "IA_"+str(itr+1), self.result_folder_name)
         IA_img = self.G(self.z)
         return IA_img, original, [IA_itr, IA_loss]
 
