@@ -88,11 +88,11 @@ class ImageAdaptiveGenerator():
             # clear gradient in optimizer
             optimizer.zero_grad()
             # print out each 100th iterations
-            if itr % 10 == 0:
+            if (itr+1) % 10 == 0:
                 print(f"iteration {itr}, loss = {loss:.10f}")
             # save images
-            if itr % 100 == 0:
-                saveImage(self.G(self.z), "CSGM_"+str(itr))
+            if (itr+1) % 100 == 0:
+                saveImage(self.G(self.z), "CSGM_"+str(itr+1))
         CSGM_img = self.G(self.z)
         return CSGM_img, original, [CSGM_itr, CSGM_loss]
 
@@ -132,11 +132,11 @@ class ImageAdaptiveGenerator():
             optimizer_z.zero_grad()
             optimizer_G.zero_grad()
             # print out each 100th iterations
-            if itr % 10 == 0:
-                print(f"iteration {itr}, loss = {loss:.10f}") 
+            if (itr+1) % 10 == 0:
+                print(f"iteration {itr+1}, loss = {loss:.10f}") 
             # save images
-            if itr % 100 == 0:
-                saveImage(self.G(self.z), "IA_"+str(itr))
+            if (itr+1) % 100 == 0:
+                saveImage(self.G(self.z), "IA_"+str(itr+1))
         IA_img = self.G(self.z)
         return IA_img, original, [IA_itr, IA_loss]
 
