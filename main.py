@@ -7,10 +7,11 @@ from image_saver import saveImage
 from plot import savePlot
 
 def main():
-    folder_name = 'result'
+    folder_name = 'TEST'
     # Hussein et al.'s method
     generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/001743.jpg', \
-                                        A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM")
+                                        A_type="Bicubic_Downsample", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM", \
+                                        result_folder_name=folder_name)
     
     saveImage(generator.x, "original", folder_name)
     saveImage(generator.y, "downsampled", folder_name)
