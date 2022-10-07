@@ -38,7 +38,7 @@ def compression_test():
     #y = dct.idct_3d(X)  # scaled DCT-III done through the last dimension
 
     X = torch.fft.fftn(x, s=None, dim=3, norm=None, out=None)
-    Y = torch.fft.ifftn(X, s=None, dim=3, norm=None, out=None)
+    y = torch.fft.ifftn(X, s=None, dim=3, norm=None, out=None)
 
     X = convert_to_PIL(X)
     y = convert_to_PIL(y)
@@ -46,8 +46,30 @@ def compression_test():
     X.show()
     y.show()
 
-def create_mask(size=1024, ):
-    pass
+def create_mask(size=1024, r=1024):
+    mask = torch.zeros(size, size)
+    x = np.mod(np.floor(np.abs(np.random.randn(size, size))*r), size)
+    y = np.mod(np.floor(np.abs(np.random.randn(size, size))*r), size)
+    mask[x,y] = 1
+    ratio = np.sum(mask.numpy()==1)/mask.numpy().size
+    return mask, ratio
 
-def compression():
-    pass
+mask, ratio = create_mask()
+print(ratio)
+
+def compression(x, mask):
+    x_transformed = torch.empty((3,1024,1024))
+    for i in range(3):
+        ch = x[i]
+        x_transformed[i] = torch.fft.fft2(ch)
+    
+    x_masked = torch.zeros((3,1024,1024))
+    for ch in range(3):
+        for i in range(1024):
+            for j in range(1024):
+                if mask[i][j] == 1:
+                    x_masked[ch][i][j] = x_transformed[ch][i][j]
+
+    
+     
+compression(x,mask)

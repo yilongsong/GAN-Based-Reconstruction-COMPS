@@ -3,8 +3,7 @@
 '''
 from model import ImageAdaptiveGenerator 
 from torchvision import transforms
-from image_saver import saveImage
-from plot import savePlot
+from visualizer import savePlot, saveImage
 
 def main():
     folder_name = 'TEST'
