@@ -37,17 +37,42 @@ def main():
     #X = dct.dct_3d(x)   # DCT-II done through the last dimension, shape = [3,1024,1024]
     #y = dct.idct_3d(X)  # scaled DCT-III done through the last dimension
 
-    X = torch.fft.fft(x)
-    Y = torch.fft.ifft(X)
+    X = torch.fft.fftn(x, s=None, dim=3, norm=None, out=None)
+    y = torch.fft.ifftn(X, s=None, dim=3, norm=None, out=None)
 
 
     X = Image.fromarray((255*X[0]).numpy().astype(np.uint8).transpose(1, 2, 0))
     #X = convert_to_PIL(X)
     #y = convert_to_PIL(Y)
-    Y = Image.fromarray((255Y[0]).numpy().astype(np.uint8).transpose(1, 2, 0))
+    Y = Image.fromarray((255*Y[0]).numpy().astype(np.uint8).transpose(1, 2, 0))
 
     X.show()
     y.show()
 
-if __name__ == '__main__':
-    main()
+def create_mask(size=1024, r=1024):
+    mask = torch.zeros(size, size)
+    x = np.mod(np.floor(np.abs(np.random.randn(size, size))*r), size)
+    y = np.mod(np.floor(np.abs(np.random.randn(size, size))*r), size)
+    mask[x,y] = 1
+    ratio = np.sum(mask.numpy()==1)/mask.numpy().size
+    return mask, ratio
+
+mask, ratio = create_mask()
+print(ratio)
+
+def compression(x, mask):
+    x_transformed = torch.empty((3,1024,1024))
+    for i in range(3):
+        ch = x[i]
+        x_transformed[i] = torch.fft.fft2(ch)
+    
+    x_masked = torch.zeros((3,1024,1024))
+    for ch in range(3):
+        for i in range(1024):
+            for j in range(1024):
+                if mask[i][j] == 1:
+                    x_masked[ch][i][j] = x_transformed[ch][i][j]
+
+    
+     
+compression(x,mask)

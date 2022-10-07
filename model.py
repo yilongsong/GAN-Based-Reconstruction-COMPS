@@ -13,7 +13,7 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 from measurementA import A
 from PGGAN import Generator
-from image_saver import saveImage
+from visualizer import saveImage
 
 class ImageAdaptiveGenerator():
     '''
@@ -59,7 +59,11 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
         self.y = self.A(self.x)
 
+        # folder that all images will be stored
         self.result_folder_name = result_folder_name
+
+    def Naive(self):
+        return self.x, self.A_dag(self.y)
 
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
         print("Launching CSGM optimization:")
@@ -98,6 +102,7 @@ class ImageAdaptiveGenerator():
             if (itr+1) % 100 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
         CSGM_img = self.G(self.z)
+        print("CSGM completed")
         return CSGM_img, original, [CSGM_itr, CSGM_loss]
 
     def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
@@ -143,6 +148,7 @@ class ImageAdaptiveGenerator():
             if (itr+1) % 100 == 0:
                 saveImage(self.G(self.z), "IA_"+str(itr+1), self.result_folder_name)
         IA_img = self.G(self.z)
+        print("IA completed")
         return IA_img, original, [IA_itr, IA_loss]
 
     def BP(self):
