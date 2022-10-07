@@ -24,7 +24,7 @@ convert_to_tensor = transforms.ToTensor()
 
 x = convert_to_tensor(img) # good image
 
-def compression_test():
+def main():
     path = "../Images/CelebA_HQ/000168.jpg"
     img = Image.open(path)
     convert_to_PIL = transforms.ToPILImage()
@@ -37,17 +37,17 @@ def compression_test():
     #X = dct.dct_3d(x)   # DCT-II done through the last dimension, shape = [3,1024,1024]
     #y = dct.idct_3d(X)  # scaled DCT-III done through the last dimension
 
-    X = torch.fft.fftn(x, s=None, dim=3, norm=None, out=None)
-    Y = torch.fft.ifftn(X, s=None, dim=3, norm=None, out=None)
+    X = torch.fft.fft(x)
+    Y = torch.fft.ifft(X)
 
-    X = convert_to_PIL(X)
-    y = convert_to_PIL(y)
+
+    X = Image.fromarray((255*X[0]).numpy().astype(np.uint8).transpose(1, 2, 0))
+    #X = convert_to_PIL(X)
+    #y = convert_to_PIL(Y)
+    Y = Image.fromarray((255Y[0]).numpy().astype(np.uint8).transpose(1, 2, 0))
 
     X.show()
     y.show()
 
-def create_mask(size=1024, ):
-    pass
-
-def compression():
-    pass
+if __name__ == '__main__':
+    main()

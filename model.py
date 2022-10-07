@@ -93,7 +93,7 @@ class ImageAdaptiveGenerator():
             optimizer.zero_grad()
             # print out each 100th iterations
             if (itr+1) % 10 == 0:
-                print(f"iteration {itr}, loss = {loss:.10f}")
+                print(f"iteration {itr+1}, loss = {loss:.10f}")
             # save images
             if (itr+1) % 100 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
