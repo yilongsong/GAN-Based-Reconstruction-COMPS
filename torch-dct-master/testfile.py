@@ -1,11 +1,5 @@
 import torch
-import torch_dct as dct
-import cv2 
 import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
-from torchvision import transforms
-import scipy
 
 def create_mask(ratio, row_size, col_size):
     mask = torch.zeros(row_size, col_size)
