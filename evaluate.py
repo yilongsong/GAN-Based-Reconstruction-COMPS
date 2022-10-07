@@ -10,7 +10,7 @@ def PSNR(original, estimation):
     psnr = PeakSignalNoiseRatio()
     return psnr(estimation, original).item()
 
-# PS (perseptual similarity)
+# PS (Perceptual Similarity)
 def PS(original, estimation):
     loss_fn = lpips.LPIPS(net='alex')
     traditional_loss_fn = lpips.LPIPS(net='vgg')
