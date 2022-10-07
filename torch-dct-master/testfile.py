@@ -1,5 +1,7 @@
 import torch
 import numpy as np
+from PIL import Image
+from torchvision import transforms
 
 def create_mask(ratio, row_size, col_size):
     mask = torch.zeros(row_size, col_size)
