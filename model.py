@@ -26,7 +26,7 @@ class ImageAdaptiveGenerator():
     scale (float): value of a fraction in the form of 1/x where x > 1
     result_folder_name: name of the folder in generated_images to store results
     '''
-    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale=1/16, result_folder_name="result"):
+    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
@@ -44,9 +44,15 @@ class ImageAdaptiveGenerator():
         self.IA_optimizer_z = IA_optimizer_z
         self.IA_optimizer_G = IA_optimizer_G
 
+        # initialize x
+        convert_to_tensor = transforms.ToTensor()
+        x_PIL = Image.open(x_path)
+        self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
+
         # initialize A
-        if A_type == 'Gaussian':
-            self.A = A.guassian_A
+        if A_type == 'Compression':
+            mask = A.create_simple_mask(self.x, scale)
+            self.A = lambda I: A.compression_A(I, mask)
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
@@ -54,9 +60,6 @@ class ImageAdaptiveGenerator():
             return
 
         # initialize y
-        convert_to_tensor = transforms.ToTensor()
-        x_PIL = Image.open(x_path)
-        self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
         self.y = self.A(self.x)
 
         # folder that all images will be stored
