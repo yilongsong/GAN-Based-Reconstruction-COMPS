@@ -1,46 +1,64 @@
 '''
     Configure model and run each step to get results
 '''
+import argparse
 from model import ImageAdaptiveGenerator 
-from torchvision import transforms
 from visualizer import savePlot, saveImage, saveTable
 
 def main():
-    folder_name = 'result10'
-    # Hussein et al.'s method
-    generator = ImageAdaptiveGenerator(GAN_type='PGGAN', CSGM_optimizer="ADAM", x_path='./Images/CelebA_HQ/004288.jpg', \
-                                        A_type="DCT_Compression", IA_optimizer_z="ADAM", IA_optimizer_G="ADAM", \
-                                        scale=0.5, result_folder_name=folder_name)
-    
-    saveImage(generator.x, "original", folder_name)
-    saveImage(generator.y, "downsampled", folder_name)
+    # Use argparse to take in command line args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--folder', action='store', type=str, required=True)
+    args = parser.parse_args()
+    folder_name = args.folder
 
-    # Naive Reconstruction through inverse A
-    original, BICUBIC_img = generator.Naive()
-    saveImage(BICUBIC_img, "BICUBIC_naive", folder_name)
+    # Instanciate our IAGAN
+    generator = ImageAdaptiveGenerator(
+            GAN_type='PGGAN', 
+            CSGM_optimizer="ADAM", 
+            IA_optimizer_z="ADAM", 
+            IA_optimizer_G="ADAM",
+            x_path='./Images/CelebA_HQ/002826.jpg',
+            A_type="Bicubic_Downsample", 
+            noise_level=40/255,
+            scale=1/16, 
+            result_folder_name=folder_name)
+    
+    # Orginal "good" image x and degraded image y
+    original_x = generator.x
+    degraded_y = generator.y
+    saveImage(original_x, "original_x", folder_name)
+    saveImage(degraded_y, "degraded_y", folder_name)
+
+    # Naive Reconstruction through pseudo-inverse A
+    naive_reconstruction = generator.Naive()
+    saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
+
+    # Image produced by GAN with the initial z
+    GAN_img = generator.GAN()
+    saveImage(GAN_img, "GAN_img", folder_name)
     
     # CSGM 
-    CSGM_img, original1, CSGM_data = generator.CSGM(csgm_iteration_number=50, csgm_learning_rate=0.1)
-    saveImage(original1, "CSGM_orginal", folder_name)
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=10, csgm_learning_rate=0.1)
     saveImage(CSGM_img, "CSGM_optimized", folder_name)
 
-    # CSGM_BP
-    CSGMBP_img = generator.BP()
-    saveImage(CSGMBP_img, "CSGM_BP", folder_name)
+    # CSGM-BP
+    CSGM_BP_img = generator.BP()
+    saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
 
     # IA
-    IA_img, original2, IA_data = generator.IA(IA_iteration_number=50, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    IA_img, IA_data = generator.IA(IA_iteration_number=10, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
     saveImage(IA_img, "IA_optimized", folder_name)
 
     # IA_BP
-    IABP_img = generator.BP()
-    saveImage(IABP_img, "IA_BP", folder_name)
+    IA_BP_img = generator.BP()
+    saveImage(IA_BP_img, "IA_BP", folder_name)
 
-    # # Save data as line graphs
+    # Save data as line graphs
     savePlot(CSGM_data, IA_data, folder_name)
 
-    # # Save data as a table
-    saveTable(original, BICUBIC_img, CSGM_img, CSGMBP_img, IA_img, IABP_img, folder_name)
+    # Save data as a table
+    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, folder_name)
 
 if __name__ == '__main__':
     main()

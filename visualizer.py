@@ -6,6 +6,9 @@ import pandas as pd
 from evaluate import PSNR, PS
 import torch
 
+'''
+    Save the input image to a specified folder
+'''
 def saveImage(img, file_name, folder_name, format='.png'):
     convert_to_PIL = transforms.ToPILImage()
     img = torch.clamp(img, 0, 1)
@@ -17,6 +20,9 @@ def saveImage(img, file_name, folder_name, format='.png'):
     image.save(path+file_name+format)
     return image
 
+'''
+    Create and save the plot
+'''
 def savePlot(CSGM_data, IA_data, folder_name):
     print('Processing data to create plots and tables....')
     IA_x_axis = [i + len(CSGM_data[0]) for i in range(len(IA_data[0]))]   
@@ -28,6 +34,9 @@ def savePlot(CSGM_data, IA_data, folder_name):
     path = './generated_images/'+folder_name+'/result.png'
     plt.savefig(path)
 
+'''
+    Crate and save the table
+'''
 def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name):
     # Bicubic
     bicubic_psnr = PSNR(original[0], Bicubic[0])

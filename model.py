@@ -1,7 +1,4 @@
-from pickletools import optimize
 import torch
-import cv2 as cv
-import numpy as np
 from torchvision import transforms
 from PIL import Image
 import torch.nn as nn
@@ -11,27 +8,20 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 """
 
-from measurementA import A
+from A import A
 from PGGAN import Generator
 from visualizer import saveImage
 
 class ImageAdaptiveGenerator():
-    '''
-    GAN_type (string): type of pretrained GAN to use
-    CSGM_optimizer (string): optimizer used: ADAM, SGD, etc.
-    x_path (string): path of image x (original image)
-    A_type (string): type of matrix A ('Gaussian', 'Bicubic_Downsample', etc.)
-    IA_optimizer_z (string): optimizer used to optimize z
-    IA_optimizer_G (string): optimizer used to optimize G
-    scale (float): value of a fraction in the form of 1/x where x > 1
-    result_folder_name: name of the folder in generated_images to store results
-    '''
-    def __init__(self, GAN_type, CSGM_optimizer, x_path, A_type, IA_optimizer_z, IA_optimizer_G, scale, result_folder_name):
+    def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, A_type, scale, noise_level, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
             self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth'))
             self.G.eval() # turn off weights modification in the inference time
+        else:
+            print('ERROR: pretrained GAN not found')
+            exit(0)
 
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
@@ -61,19 +51,43 @@ class ImageAdaptiveGenerator():
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
         else:
-            return
+            print('ERROR: A not found')
+            exit(0)
 
-        # initialize y
+        # initialize y with given noise_level
         self.y = self.A(self.x)
+        noise = torch.rand_like(self.y)*noise_level
+        self.y += noise
 
         # folder that all images will be stored
         self.result_folder_name = result_folder_name
 
+    '''
+        Return a naive reconstruction of y obtained through A_dag
+        @params: None
+        @return: a naive reconstruction of y
+    '''
     def Naive(self):
-        return self.x, self.A_dag(self.y)
+        return self.A_dag(self.y)
 
+    '''
+        Return an image produced by GAN with the initial z
+        @params: None
+        @return: G(z)
+    '''
+    def GAN(self):
+        return self.G(self.z)
+
+    '''
+        Perform CSGM given the number of iteration and learning rate
+        @params: csgm_iteration_number - # of iterations
+                 csgm_learning_rate - the learning rate
+        @return: CSGM_img - the image obtained by CSGM
+                 [CSGM_itr, CSGM_loss] - a list containing data of change in loss function
+    '''
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
         print("Launching CSGM optimization:")
+    
         # arrays that store data from CSGM
         CSGM_itr = [i for i in range(csgm_iteration_number)]
         CSGM_loss = []
@@ -85,14 +99,14 @@ class ImageAdaptiveGenerator():
             optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
         elif self.CSGM_optimizer == "ADAM":
             optimizer = torch.optim.Adam(params=[self.z], lr=csgm_learning_rate)
+        else:
+            print('ERROR: CSGM optimizer not found')
+            exit(0)
 
         # CSGM training starts here
         for itr in range(csgm_iteration_number):
             # generate an image from the current z
             Gz = self.G(self.z)
-            # save the initial image fron GAN
-            if itr == 0:
-                original = Gz
             # create the loss function
             loss = cost(self.y, self.A(Gz))
             CSGM_loss.append(loss.item())
@@ -102,16 +116,25 @@ class ImageAdaptiveGenerator():
             optimizer.step()
             # clear gradient in optimizer
             optimizer.zero_grad()
-            # print out each 100th iterations
+            # print out each 10th iterations
             if (itr+1) % 10 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}")
-            # save images
-            if (itr+1) % 10 == 0:
+            # save images every 100th image
+            if (itr+1) % 100 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
+
         CSGM_img = self.G(self.z)
         print("CSGM completed")
-        return CSGM_img, original, [CSGM_itr, CSGM_loss]
+        return CSGM_img, [CSGM_itr, CSGM_loss]
 
+    '''
+        Perform IA given the number of iteration and learning rates
+        @params: IA_iteration_number - # of iterations
+                 IA_z_learning_rate - the learning rate for z
+                 IA_G_learning_rate - the learning rate for G
+        @return: IA_img - the image obtained by CSGM
+                 [IA_itr, IA_loss] - a list containing data of change in loss function
+    '''
     def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
         print("Launching IA optimization:")
         # arrays that store data from IA
@@ -123,20 +146,20 @@ class ImageAdaptiveGenerator():
         # define the optimizer for z (as of now, ADAM only)
         if self.IA_optimizer_z == "ADAM":
             optimizer_z = torch.optim.Adam(params=[self.z], lr=IA_z_learning_rate)
+        else:
+            print('ERROR: CSGM optimizer for z not found')
+            exit(0)
         # define the optimizer for G (as of now ADAM only)
         if self.IA_optimizer_G == "ADAM":
             optimizer_G = torch.optim.Adam(params=self.G.parameters(), lr=IA_G_learning_rate)
-
-        # unfreeze G's params (maybe)
+        else:
+            print('ERROR: IA optimizer for G not found')
+            exit(0)
 
         # IA steps here
-        # CSGM training starts here
         for itr in range(IA_iteration_number):
             # generate an image from the current z
             Gz = self.G(self.z)
-            # save the initial image fron GAN
-            if itr == 0:
-                original = Gz
             # create the loss function
             loss = cost(self.y, self.A(Gz))
             IA_loss.append(loss.item())
@@ -148,16 +171,22 @@ class ImageAdaptiveGenerator():
             # clear gradient in optimizer
             optimizer_z.zero_grad()
             optimizer_G.zero_grad()
-            # print out each 100th iterations
+            # print out each 10th iterations
             if (itr+1) % 10 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}") 
-            # save images
-            if (itr+1) % 10 == 0:
+            # save images every 100th image
+            if (itr+1) % 100 == 0:
                 saveImage(self.G(self.z), "IA_"+str(itr+1), self.result_folder_name)
+
         IA_img = self.G(self.z)
         print("IA completed")
-        return IA_img, original, [IA_itr, IA_loss]
+        return IA_img, [IA_itr, IA_loss]
 
+    '''
+        Perform BP through A_dag
+        @params: None
+        @return: x_hat - the image obtained by BP
+    '''
     def BP(self):
         #enforce compliance
         xhat = self.G(self.z)
