@@ -1,17 +1,27 @@
-'''
-x = torch.randn(200)
-x = x[None, :]
-x = x[None, :]
-X = dct.dct_3d(x)   # DCT-II done through the last dimension
-y = dct.idct_3d(X)  # scaled DCT-III done through the last dimension
-#print((torch.abs(x - y)).sum())
-#print((torch.abs(x - y)).sum() < 1e-10)
-#assert (torch.abs(x - y)).sum() < 1e-10  # x == y within numerical tolerance
+# def save_imag(I):
+#     I = torch.clamp(I, 0, 1)
+#     I_PIL = convert_to_PIL(I[0])
+#     I_PIL.save('output.png')
 
-path = "../Images/CelebA_HQ/000168.jpg"
-img = Image.open(path)
-convert_to_PIL = transforms.ToPILImage()
-convert_to_tensor = transforms.ToTensor()
+# def load_img(dir):
+#     I_PIL = Image.open(dir)
+#     I = convert_to_Tensor(I_PIL).unsqueeze(0)
+#     return I
 
-x = convert_to_tensor(img) # good image
-'''
+# I = load_img('./Images/CelebA_HQ/004288.jpg')
+# out = torch.nn.functional.interpolate(I, scale_factor=1/16, mode='bicubic', align_corners=False, antialias=True)
+# save_imag(out)
+
+# import torch
+# import torchvision
+# from torchvision import transforms
+# from PIL import Image
+# convert_to_tensor = transforms.ToTensor()
+# convert_to_PIL = transforms.ToPILImage()
+# I_PIL = Image.open('./Images/CelebA_HQ/004288.jpg')
+# blur = transforms.GaussianBlur(kernel_size=(3,7))
+# I = convert_to_tensor(I_PIL)
+# blurred_I = blur(I)
+# blurred_I_PIL = convert_to_PIL(blurred_I)
+# blurred_I_PIL.show()
+# I_PIL.show()

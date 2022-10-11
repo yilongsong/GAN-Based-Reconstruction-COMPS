@@ -4,9 +4,11 @@ from torchvision import transforms
 from PIL import Image
 import pandas as pd
 from evaluate import PSNR, PS
+import torch
 
 def saveImage(img, file_name, folder_name, format='.png'):
     convert_to_PIL = transforms.ToPILImage()
+    img = torch.clamp(img, 0, 1)
     image = convert_to_PIL(img[0])
     path = './generated_images/'+folder_name+'/'
     # Create folder if folder doesn't already exist

@@ -50,9 +50,13 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
 
         # initialize A
-        if A_type == 'Compression':
+        if A_type == 'Naive_Compression':
             mask = A.create_simple_mask(self.x, scale)
-            self.A = lambda I: A.compression_A(I, mask)
+            self.A = lambda I: A.simple_compression_A(I, mask)
+            self.A_dag = self.A
+        elif A_type == 'DCT_Compression':
+            self.A = lambda I: A.dct_compression_A(I)
+            self.A_dag = lambda I: A.idct_compression_A(I)
         elif A_type == 'Bicubic_Downsample':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
@@ -102,7 +106,7 @@ class ImageAdaptiveGenerator():
             if (itr+1) % 10 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}")
             # save images
-            if (itr+1) % 100 == 0:
+            if (itr+1) % 10 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
         CSGM_img = self.G(self.z)
         print("CSGM completed")
@@ -148,7 +152,7 @@ class ImageAdaptiveGenerator():
             if (itr+1) % 10 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}") 
             # save images
-            if (itr+1) % 100 == 0:
+            if (itr+1) % 10 == 0:
                 saveImage(self.G(self.z), "IA_"+str(itr+1), self.result_folder_name)
         IA_img = self.G(self.z)
         print("IA completed")
