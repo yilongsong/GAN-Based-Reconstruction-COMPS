@@ -61,6 +61,7 @@ class ImageAdaptiveGenerator():
         # initialize y with given noise_level
         self.y = self.A(self.x)
         noise = torch.rand_like(self.y)*noise_level
+        noise.to(device)
         self.y += noise
         self.y.to(device)
 
