@@ -18,8 +18,7 @@ class ImageAdaptiveGenerator():
     def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, A_type, scale, noise_level, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
-            self.G = Generator()
-            self.G.to(device)
+            self.G = Generator().to(device)
             self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth', map_location=device))
             self.G.eval() # turn off weights modification in the inference time
         else:
@@ -40,8 +39,7 @@ class ImageAdaptiveGenerator():
         # initialize x
         convert_to_tensor = transforms.ToTensor()
         x_PIL = Image.open(x_path)
-        self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
-        self.x.to(device)
+        self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0).to(device)
 
         # initialize A
         if A_type == 'Naive_Compression':
@@ -59,11 +57,9 @@ class ImageAdaptiveGenerator():
             exit(0)
 
         # initialize y with given noise_level
-        self.y = self.A(self.x)
-        noise = torch.rand_like(self.y)*noise_level
-        noise.to(device)
+        self.y = self.A(self.x).to(device)
+        noise = (torch.rand_like(self.y)*noise_level).to(device)
         self.y += noise
-        self.y.to(device)
 
         # folder that all images will be stored
         self.result_folder_name = result_folder_name
@@ -114,7 +110,7 @@ class ImageAdaptiveGenerator():
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y, self.A(Gz))
+            loss = cost(self.y, self.A(Gz).to(device))
             CSGM_loss.append(loss.item())
             # back-propagation
             loss.backward()
@@ -167,7 +163,7 @@ class ImageAdaptiveGenerator():
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y, self.A(Gz))
+            loss = cost(self.y, self.A(Gz).to(device))
             IA_loss.append(loss.item())
             # back-propagation
             loss.backward()
