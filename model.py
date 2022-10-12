@@ -228,7 +228,7 @@ def run_model(img, parent_path, img_folder):
     saveImage(GAN_img, "GAN_img", folder_name)
     
     # CSGM 
-    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=10, csgm_learning_rate=0.1)
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=1800, csgm_learning_rate=0.1)
     saveImage(CSGM_img, "CSGM_optimized", folder_name)
 
     # CSGM-BP
@@ -236,7 +236,7 @@ def run_model(img, parent_path, img_folder):
     saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
 
     # IA
-    IA_img, IA_data = generator.IA(IA_iteration_number=10, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
     saveImage(IA_img, "IA_optimized", folder_name)
 
     # IA_BP
@@ -247,4 +247,4 @@ def run_model(img, parent_path, img_folder):
     savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to a table
-    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, parent_path)
+    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, parent_path, device)

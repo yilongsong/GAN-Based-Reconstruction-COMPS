@@ -37,22 +37,22 @@ def savePlot(CSGM_data, IA_data, folder_name):
 '''
     Crate and save the table
 '''
-def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name):
+def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
     # Bicubic
-    bicubic_psnr = PSNR(original[0], Bicubic[0])
-    bicubic_ps, bicubic_ps_t = PS(original[0], Bicubic[0])
+    bicubic_psnr = PSNR(original[0], Bicubic[0], device)
+    bicubic_ps, bicubic_ps_t = PS(original[0], Bicubic[0], device)
     # CSGM
-    csgm_psnr = PSNR(original[0], CSGM[0])
-    csgm_ps, csgm_ps_t = PS(original[0], CSGM[0])
+    csgm_psnr = PSNR(original[0], CSGM[0], device)
+    csgm_ps, csgm_ps_t = PS(original[0], CSGM[0], device)
     # CSGM BP
-    csgm_bp_psnr = PSNR(original[0], CSGM_BP[0])
-    csgm_bp_ps, csgm_bp_ps_t = PS(original[0], CSGM_BP[0])
+    csgm_bp_psnr = PSNR(original[0], CSGM_BP[0], device)
+    csgm_bp_ps, csgm_bp_ps_t = PS(original[0], CSGM_BP[0], device)
     # IA
-    ia_psnr = PSNR(original[0], IA[0])
-    ia_ps, ia_ps_t = PS(original[0], IA[0])
+    ia_psnr = PSNR(original[0], IA[0], device)
+    ia_ps, ia_ps_t = PS(original[0], IA[0], device)
     # IA BP
-    ia_bp_psnr = PSNR(original[0], IA_BP[0])
-    ia_bp_ps, ia_bp_ps_t = PS(original[0], IA_BP[0])
+    ia_bp_psnr = PSNR(original[0], IA_BP[0], device)
+    ia_bp_ps, ia_bp_ps_t = PS(original[0], IA_BP[0], device)
 
     # create three dataframes
     df_psnr = pd.DataFrame({
