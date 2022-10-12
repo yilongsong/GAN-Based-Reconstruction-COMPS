@@ -98,7 +98,7 @@ class ImageAdaptiveGenerator():
         CSGM_loss = []
     
         # define the cost function
-        cost = nn.MSELoss()
+        cost = nn.MSELoss().to(device)
         # define the optimizer
         if self.CSGM_optimizer == "SGD":
             optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
@@ -147,7 +147,7 @@ class ImageAdaptiveGenerator():
         IA_loss = []
 
         # define the cost function
-        cost = nn.MSELoss()
+        cost = nn.MSELoss().to(device)
         # define the optimizer for z (as of now, ADAM only)
         if self.IA_optimizer_z == "ADAM":
             optimizer_z = torch.optim.Adam(params=[self.z], lr=IA_z_learning_rate)
