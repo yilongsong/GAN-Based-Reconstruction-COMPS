@@ -13,7 +13,7 @@ def saveImage(img, file_name, folder_name, format='.png'):
     convert_to_PIL = transforms.ToPILImage()
     img = torch.clamp(img, 0, 1)
     image = convert_to_PIL(img[0])
-    path = './generated_images/'+folder_name+'/'
+    path = './Results/'+folder_name+'/'
     # Create folder if folder doesn't already exist
     if not os.path.exists(path):
             os.makedirs(path)
@@ -31,7 +31,7 @@ def savePlot(CSGM_data, IA_data, folder_name):
     plt.xlabel('iteration #', fontsize=14)
     plt.ylabel('loss', fontsize=14)
     plt.grid(True)
-    path = './generated_images/'+folder_name+'/result.png'
+    path = './Results/'+folder_name+'/result.png'
     plt.savefig(path)
 
 '''
@@ -68,6 +68,6 @@ def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name):
         "IA-BP": ia_bp
     })
     #store it as csv
-    path = './generated_images/'+folder_name+'/table.csv'
+    path = './Results/'+folder_name+'/table.csv'
     df = df.round(decimals=3)
     df.to_csv(path, index=False)

@@ -1,9 +1,11 @@
 '''
     Configure model and run each step to get results
+    https://pynative.com/python-copy-files-and-directories/
 '''
 import argparse
 from model import ImageAdaptiveGenerator 
 from visualizer import savePlot, saveImage, saveTable
+import shutil
 
 def main():
     # Use argparse to take in command line args
@@ -39,7 +41,7 @@ def main():
     saveImage(GAN_img, "GAN_img", folder_name)
     
     # CSGM 
-    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=10, csgm_learning_rate=0.1)
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=1, csgm_learning_rate=0.1)
     saveImage(CSGM_img, "CSGM_optimized", folder_name)
 
     # CSGM-BP
@@ -47,7 +49,7 @@ def main():
     saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
 
     # IA
-    IA_img, IA_data = generator.IA(IA_iteration_number=10, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    IA_img, IA_data = generator.IA(IA_iteration_number=1, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
     saveImage(IA_img, "IA_optimized", folder_name)
 
     # IA_BP
@@ -59,6 +61,12 @@ def main():
 
     # Save data as a table
     saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, folder_name)
+
+    # delete the modified weights and change it back to the original one
+    src_path = './saved_weights/100_celeb_hq_network-snapshot-010403.pth'
+    dst_path = './weights/100_celeb_hq_network-snapshot-010403.pth'
+    shutil.copy(src_path, dst_path)
+    print('Weights Copied')
 
 if __name__ == '__main__':
     main()
