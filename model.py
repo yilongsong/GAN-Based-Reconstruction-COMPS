@@ -10,21 +10,24 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 from A import A
 from PGGAN import Generator
-from visualizer import saveImage
+from visualizer import savePlot, saveImage, saveTable
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ImageAdaptiveGenerator():
     def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, A_type, scale, noise_level, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator()
-            self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth'))
+            self.G.to(device)
+            self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth', map_location=device))
             self.G.eval() # turn off weights modification in the inference time
         else:
             print('ERROR: pretrained GAN not found')
             exit(0)
 
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
-        z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1))
+        z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1)).to(device)
         self.z = torch.autograd.Variable(z_init, requires_grad = True)
 
         # initialize CSGM optimizer
@@ -38,6 +41,7 @@ class ImageAdaptiveGenerator():
         convert_to_tensor = transforms.ToTensor()
         x_PIL = Image.open(x_path)
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
+        self.x.to(device)
 
         # initialize A
         if A_type == 'Naive_Compression':
@@ -58,6 +62,7 @@ class ImageAdaptiveGenerator():
         self.y = self.A(self.x)
         noise = torch.rand_like(self.y)*noise_level
         self.y += noise
+        self.y.to(device)
 
         # folder that all images will be stored
         self.result_folder_name = result_folder_name
@@ -117,10 +122,10 @@ class ImageAdaptiveGenerator():
             # clear gradient in optimizer
             optimizer.zero_grad()
             # print out each 10th iterations
-            if (itr+1) % 10 == 0:
+            if (itr+1) % 100 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}")
             # save images every 100th image
-            if (itr+1) % 100 == 0:
+            if (itr+1) % 600 == 0:
                 saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
 
         CSGM_img = self.G(self.z)
@@ -172,7 +177,7 @@ class ImageAdaptiveGenerator():
             optimizer_z.zero_grad()
             optimizer_G.zero_grad()
             # print out each 10th iterations
-            if (itr+1) % 10 == 0:
+            if (itr+1) % 100 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}") 
             # save images every 100th image
             if (itr+1) % 100 == 0:
@@ -192,3 +197,57 @@ class ImageAdaptiveGenerator():
         xhat = self.G(self.z)
         xhat = torch.add(self.A_dag((torch.sub(self.y, self.A(xhat)))), xhat)
         return xhat
+
+'''
+    Instantiate the model given folder name and image name
+'''
+def run_model(img, parent_path, img_folder):
+    folder_name = parent_path + img_folder
+
+    # Instanciate our IAGAN
+    generator = ImageAdaptiveGenerator(
+            GAN_type='PGGAN', 
+            CSGM_optimizer="ADAM", 
+            IA_optimizer_z="ADAM", 
+            IA_optimizer_G="ADAM",
+            x_path=img,
+            A_type="Bicubic_Downsample", 
+            noise_level=0/255,
+            scale=1/16, 
+            result_folder_name=folder_name)
+    
+    # Orginal "good" image x and degraded image y
+    original_x = generator.x
+    degraded_y = generator.y
+    saveImage(original_x, "original_x", folder_name)
+    saveImage(degraded_y, "degraded_y", folder_name)
+
+    # Naive Reconstruction through pseudo-inverse A
+    naive_reconstruction = generator.Naive()
+    saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
+
+    # Image produced by GAN with the initial z
+    GAN_img = generator.GAN()
+    saveImage(GAN_img, "GAN_img", folder_name)
+    
+    # CSGM 
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=10, csgm_learning_rate=0.1)
+    saveImage(CSGM_img, "CSGM_optimized", folder_name)
+
+    # CSGM-BP
+    CSGM_BP_img = generator.BP()
+    saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
+
+    # IA
+    IA_img, IA_data = generator.IA(IA_iteration_number=10, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    saveImage(IA_img, "IA_optimized", folder_name)
+
+    # IA_BP
+    IA_BP_img = generator.BP()
+    saveImage(IA_BP_img, "IA_BP", folder_name)
+
+    # Save data as line graphs
+    savePlot(CSGM_data, IA_data, folder_name)
+
+    # Save data to a table
+    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, parent_path)

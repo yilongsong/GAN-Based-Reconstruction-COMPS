@@ -25,3 +25,9 @@
 # blurred_I_PIL = convert_to_PIL(blurred_I)
 # blurred_I_PIL.show()
 # I_PIL.show()
+
+# Use argparse to take in command line args
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--folder', action='store', type=str, required=True)
+    # args = parser.parse_args()
+    # folder_name = args.folder
