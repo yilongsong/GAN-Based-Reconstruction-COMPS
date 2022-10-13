@@ -32,6 +32,8 @@ def main():
     for img in images:
         if count >= 20:
             break
+        elif count < 10:
+            continue
         print('Start reconstruction on ' + img)
         parent_path = './Results/Bicubic_0N_16S/'
         img_folder = search(r'\d+', img).group()
