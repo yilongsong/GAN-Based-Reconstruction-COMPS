@@ -25,7 +25,8 @@ def saveImage(img, file_name, folder_name, format='.jpg'):
 '''
 def savePlot(CSGM_data, IA_data, folder_name):
     print('Processing data to create plots and tables....')
-    IA_x_axis = [i + len(CSGM_data[0]) for i in range(len(IA_data[0]))]   
+    IA_x_axis = [i + len(CSGM_data[0]) for i in range(len(IA_data[0]))]  
+    plt.clf() 
     plt.plot(CSGM_data[0], CSGM_data[1], color='red')
     plt.plot(IA_x_axis, IA_data[1], color='blue')
     plt.xlabel('iteration #', fontsize=14)

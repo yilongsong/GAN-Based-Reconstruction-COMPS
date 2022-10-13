@@ -28,11 +28,16 @@ def main():
     images = [f for f in files if ('.jpg' or '.png') in f]
     images.sort(key=natural_keys)
     
+    count = 0
     for img in images:
+        if count >= 20:
+            break
+        print('Start reconstruction on ' + img)
         parent_path = './Results/Bicubic_0N_16S/'
         img_folder = search(r'\d+', img).group()
         run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
         reset_weights()
+        count += 1
 
 if __name__ == '__main__':
     main()
