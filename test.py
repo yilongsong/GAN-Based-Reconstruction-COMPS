@@ -12,19 +12,19 @@
 # out = torch.nn.functional.interpolate(I, scale_factor=1/16, mode='bicubic', align_corners=False, antialias=True)
 # save_imag(out)
 
-# import torch
-# import torchvision
-# from torchvision import transforms
-# from PIL import Image
-# convert_to_tensor = transforms.ToTensor()
-# convert_to_PIL = transforms.ToPILImage()
-# I_PIL = Image.open('./Images/CelebA_HQ/004288.jpg')
-# blur = transforms.GaussianBlur(kernel_size=(3,7))
-# I = convert_to_tensor(I_PIL)
-# blurred_I = blur(I)
-# blurred_I_PIL = convert_to_PIL(blurred_I)
-# blurred_I_PIL.show()
-# I_PIL.show()
+import torch
+import torchvision
+from torchvision import transforms
+from PIL import Image
+convert_to_tensor = transforms.ToTensor()
+convert_to_PIL = transforms.ToPILImage()
+I_PIL = Image.open('./Images/CelebA_HQ/4.jpg')
+blur = transforms.GaussianBlur(kernel_size=(51, 51), sigma=(9, 9))
+I = convert_to_tensor(I_PIL)
+blurred_I = blur(I)
+blurred_I_PIL = convert_to_PIL(blurred_I)
+blurred_I_PIL.show()
+I_PIL.show()
 
 # Use argparse to take in command line args
     # parser = argparse.ArgumentParser()
