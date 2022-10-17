@@ -216,32 +216,32 @@ def run_model(img, parent_path, img_folder):
     # Orginal "good" image x and degraded image y
     original_x = generator.x
     degraded_y = generator.y
-    saveImage(original_x, "original_x", folder_name)
-    saveImage(degraded_y, "degraded_y", folder_name)
+    #saveImage(original_x, "original_x", folder_name)
+    #saveImage(degraded_y, "degraded_y", folder_name)
 
     # Naive Reconstruction through pseudo-inverse A
     naive_reconstruction = generator.Naive()
-    saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
+    #saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
 
     # Image produced by GAN with the initial z
     GAN_img = generator.GAN()
-    saveImage(GAN_img, "GAN_img", folder_name)
+    #saveImage(GAN_img, "GAN_img", folder_name)
     
     # CSGM 
     CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=1800, csgm_learning_rate=0.1)
-    saveImage(CSGM_img, "CSGM_optimized", folder_name)
+    #saveImage(CSGM_img, "CSGM_optimized", folder_name)
 
     # CSGM-BP
     CSGM_BP_img = generator.BP()
-    saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
+    #saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
 
     # IA
     IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
-    saveImage(IA_img, "IA_optimized", folder_name)
+    #saveImage(IA_img, "IA_optimized", folder_name)
 
     # IA_BP
     IA_BP_img = generator.BP()
-    saveImage(IA_BP_img, "IA_BP", folder_name)
+    #saveImage(IA_BP_img, "IA_BP", folder_name)
 
     # Save data as line graphs
     savePlot(CSGM_data, IA_data, folder_name)
