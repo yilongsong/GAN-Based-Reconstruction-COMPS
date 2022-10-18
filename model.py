@@ -244,7 +244,7 @@ def run_model(img, parent_path, img_folder):
     #saveImage(IA_BP_img, "IA_BP", folder_name)
 
     # Save data as line graphs
-    savePlot(CSGM_data, IA_data, folder_name)
+    #savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to a table
     saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, parent_path, device)
