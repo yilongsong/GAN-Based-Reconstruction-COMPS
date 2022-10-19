@@ -30,13 +30,13 @@ def main():
     
     count = 0
     for img in images:
-        if count >= 101:
+        if count >= 10:
             break
-        elif count < 90:
+        elif count < 0:
             count += 1
             continue
         print('Start reconstruction on ' + img)
-        parent_path = './Results/Bicubic_0N_16S/'
+        parent_path = './Results/Bicubic_0N_8S/'
         img_folder = search(r'\d+', img).group()
         run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
         reset_weights()
