@@ -30,9 +30,9 @@ def main():
     
     count = 0
     for img in images:
-        if count >= 20:
+        if count >= 40:
             break
-        elif count < 10:
+        elif count < 30:
             count += 1
             continue
         print('Start reconstruction on ' + img)
