@@ -25,15 +25,12 @@ class A():
     def create_simple_mask(img, ratio):
         rows = img.shape[2]
         cols = img.shape[3]
-        #if (self.simple_mask == None):
         mask = torch.zeros((rows, cols))
         a = torch.tensor(list(product(range(rows), range(cols))))
         prob = torch.tensor([1/(rows*cols)]*rows*cols)
         idx = prob.multinomial(num_samples=int(rows*cols*ratio), replacement=False)
         for i in a[idx]:
             mask[i[0], i[1]] = 1
-        #else:
-            #mask = self.simple_mask
         return mask
 
     def simple_compression_A(mask, img):
