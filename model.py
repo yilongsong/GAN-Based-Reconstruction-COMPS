@@ -209,8 +209,8 @@ def run_model(img, parent_path, img_folder):
             IA_optimizer_G="ADAM",
             x_path=img,
             A_type="Bicubic_Downsample", 
-            noise_level=10/255,
-            scale=1/8, 
+            noise_level=0/255,
+            scale=1/32, 
             result_folder_name=folder_name)
     
     # Orginal "good" image x and degraded image y
