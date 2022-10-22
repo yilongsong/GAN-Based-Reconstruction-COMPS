@@ -37,7 +37,7 @@ def main():
             break
         
         print('Start reconstruction on ' + img)
-        parent_path = './Results/Bicubic_0N_32S/'
+        parent_path = './Results/Bicubic_40N_16S/'
         img_folder = search(r'\d+', img).group()
         run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
         reset_weights()
