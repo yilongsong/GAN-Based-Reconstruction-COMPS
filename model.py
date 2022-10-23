@@ -22,9 +22,6 @@ class ImageAdaptiveGenerator():
             self.G = Generator().to(device)
             self.G.load_state_dict(torch.load('./weights/PGGAN_weights.pth', map_location=device))
             self.G.eval() # turn off weights modification in the inference time
-        else:
-            print('ERROR: GAN not found')
-            exit(0)
 
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1)).to(device)
@@ -53,9 +50,6 @@ class ImageAdaptiveGenerator():
         elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
-        else:
-            print('ERROR: A not found')
-            exit(0)
 
         # initialize y with given noise_level
         self.y = self.A(self.x).to(device)

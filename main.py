@@ -26,12 +26,16 @@ def parse_args():
 
     if args.GAN not in GANs:
         print('ERROR: GAN not found')
+        exit(0)
     elif args.scale not in scales:
         print('ERROR: scale needs to be 4, 8, 16, or 32')
+        exit(0)
     elif args.noise not in noises:
         print('ERROR: noise level needs to be 0, 10, or 40')
+        exit(0)
     elif args.task not in tasks:
         print('ERROR: not a valid task')
+        exit(0)
 
     params = {
         'GAN': args.GAN,
