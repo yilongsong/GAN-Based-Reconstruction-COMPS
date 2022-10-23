@@ -4,45 +4,83 @@
 '''
 
 import shutil
-from re import search, split
+import argparse
+from re import split
 from os import listdir, remove
 from os.path import isfile, join
 from model import run_model
 
-def reset_weights():
-    src_path = './saved_weights/100_celeb_hq_network-snapshot-010403.pth'
-    dst_path = './weights/100_celeb_hq_network-snapshot-010403.pth'
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--GAN', type=str, required=True)
+    parser.add_argument('--scale', type=int, required=True)
+    parser.add_argument('--noise', type=int, required=True)
+    parser.add_argument('--task', type=str, required=True)
+    args = parser.parse_args()
+
+    GANs = ['PGGAN', 'DCGAN']
+    scales = [4, 8, 16, 32]
+    noises = [0, 10, 40]
+    tasks = ['Naive_Compression', 'DCT_Compression', 'Bicubic']
+    
+    if args.GAN not in GANs:
+        print('ERROR: GAN not found')
+    elif args.scale not in scales:
+        print('ERROR: scale needs to be 4, 8, 16, or 32')
+    elif args.noise not in noises:
+        print('ERROR: noise level needs to be 0, 10, or 40')
+    elif args.task not in tasks:
+        print('ERROR: not a valid task')
+
+    params = {
+        'GAN': args.GAN,
+        'scale': args.scale,
+        'noise_level': args.noise,
+        'A_type': args.task,
+        'parent_path': './Results/' + args.GAN + '/' + args.task + '_' \
+            + str(args.noise) + 'N_' + str(args.scale) + 'S/'
+    }
+
+    if args.GAN == 'PGGAN':
+        params['img_dir'] = './Images/CelebA_HQ'
+        params['weights_path'] = 'PGGAN_weights.pth'
+        params['CSGM_itr'] = 1800
+        params['IA_G_learning_rate'] = 0.001
+    else:
+        params['img_dir'] = './Images/CelebA'
+        params['weights_path'] = 'DCGAN_weights.pth'
+        params['CSGM_itr'] = 1600
+        params['IA_G_learning_rate'] = 0.0001
+
+    return params
+
+def reset_weights(weights_path):
+    src_path = './saved_weights/' + weights_path
+    dst_path = './weights/' + weights_path
     remove(dst_path)
     shutil.copy(src_path, dst_path)
     print('Weights Copied')
 
-def atoi(text):
-    return int(text) if text.isdigit() else text
-
 def natural_keys(text):
+    atoi = lambda x: int(x) if x.isdigit() else x
     return [ atoi(c) for c in split(r'(\d+)', text) ]
 
 def main():
-    img_dir = './Images/CelebA_HQ'
+    # Read and get command line args
+    params = parse_args()
+    # Create a list of training/testing images
+    img_dir = params['img_dir']
     files = [f for f in listdir(img_dir) if isfile(join(img_dir, f))]
     images = [f for f in files if ('.jpg' or '.png') in f]
     images.sort(key=natural_keys)
-    
-    count = 0
+    # Run the model on each image
     for img in images:
-        if count < 0 or count == 15:
-            count += 1
-            continue
-        elif count >= 10:
-            break
-        
         print('Start reconstruction on ' + img)
-        parent_path = './Results/Bicubic_40N_16S/'
-        img_folder = search(r'\d+', img).group()
-        run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
-        reset_weights()
-        count += 1
-
+        # parent_path = params['parent_path']
+        # img_folder = search(r'\d+', img).group()
+        # run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
+        run_model(img, params)
+        reset_weights(params['weights_path'])
 
 if __name__ == '__main__':
     main()

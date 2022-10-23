@@ -1,7 +1,8 @@
 import torch
+import torch.nn as nn
+from re import search
 from torchvision import transforms
 from PIL import Image
-import torch.nn as nn
 
 """
 https://neptune.ai/blog/pytorch-loss-functions
@@ -19,10 +20,10 @@ class ImageAdaptiveGenerator():
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator().to(device)
-            self.G.load_state_dict(torch.load('./weights/100_celeb_hq_network-snapshot-010403.pth', map_location=device))
+            self.G.load_state_dict(torch.load('./weights/PGGAN_weights.pth', map_location=device))
             self.G.eval() # turn off weights modification in the inference time
         else:
-            print('ERROR: pretrained GAN not found')
+            print('ERROR: GAN not found')
             exit(0)
 
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
@@ -49,7 +50,7 @@ class ImageAdaptiveGenerator():
         elif A_type == 'DCT_Compression':
             self.A = lambda I: A.dct_compression_A(I)
             self.A_dag = lambda I: A.idct_compression_A(I)
-        elif A_type == 'Bicubic_Downsample':
+        elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
         else:
@@ -198,19 +199,21 @@ class ImageAdaptiveGenerator():
 '''
     Instantiate the model given folder name and image name
 '''
-def run_model(img, parent_path, img_folder):
-    folder_name = parent_path + img_folder
+def run_model(img, params):
+    # create a folder that stores our result
+    img_path = params['img_dir']+'/'+img
+    folder_name = params['parent_path'] + search(r'\d+', img_path).group()
 
     # Instanciate our IAGAN
     generator = ImageAdaptiveGenerator(
-            GAN_type='PGGAN', 
+            GAN_type=params['GAN'], 
             CSGM_optimizer="ADAM", 
             IA_optimizer_z="ADAM", 
             IA_optimizer_G="ADAM",
-            x_path=img,
-            A_type="Bicubic_Downsample", 
-            noise_level=40/255,
-            scale=1/16, 
+            x_path=img_path,
+            A_type=params['A_type'], 
+            noise_level=params['noise_level']/255,
+            scale=1/params['scale'], 
             result_folder_name=folder_name)
     
     # Orginal "good" image x and degraded image y
@@ -228,7 +231,7 @@ def run_model(img, parent_path, img_folder):
     #saveImage(GAN_img, "GAN_img", folder_name)
     
     # CSGM 
-    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=1800, csgm_learning_rate=0.1)
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=0.1)
     #saveImage(CSGM_img, "CSGM_optimized", folder_name)
 
     # CSGM-BP
@@ -236,7 +239,7 @@ def run_model(img, parent_path, img_folder):
     #saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
 
     # IA
-    IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=0.001)
+    IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=params['IA_G_learning_rate'])
     #saveImage(IA_img, "IA_optimized", folder_name)
 
     # IA_BP
@@ -247,4 +250,4 @@ def run_model(img, parent_path, img_folder):
     #savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to a table
-    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, parent_path, device)
+    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
