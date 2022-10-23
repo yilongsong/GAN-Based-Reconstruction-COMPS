@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('--scale', type=int, required=True)
     parser.add_argument('--noise', type=int, required=True)
     parser.add_argument('--task', type=str, required=True)
+    parser.add_argument('--save_images', action='store_true')
     args = parser.parse_args()
 
     GANs = ['PGGAN', 'DCGAN']
@@ -38,7 +39,8 @@ def parse_args():
         'noise_level': args.noise,
         'A_type': args.task,
         'parent_path': './Results/' + args.GAN + '/' + args.task + '_' \
-            + str(args.noise) + 'N_' + str(args.scale) + 'S/'
+            + str(args.noise) + 'N_' + str(args.scale) + 'S/',
+        'save_images': args.save_images
     }
 
     if args.GAN == 'PGGAN':

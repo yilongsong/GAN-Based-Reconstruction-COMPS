@@ -82,10 +82,10 @@ def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
 
     #store them as csv's
     df_psnr = df_psnr.round(decimals=3)
-    df_psnr.to_csv(folder_name+'/psnr.csv', mode='a', index=False, header=False)
+    df_psnr.to_csv(folder_name+'psnr.csv', mode='a', index=False, header=False)
 
     df_ps = df_ps.round(decimals=3)
-    df_ps.to_csv(folder_name+'/ps.csv', mode='a', index=False, header=False)
+    df_ps.to_csv(folder_name+'ps.csv', mode='a', index=False, header=False)
 
     df_ps_t = df_ps_t.round(decimals=3)
-    df_ps_t.to_csv(folder_name+'/ps_t.csv', mode='a', index=False, header=False)
+    df_ps_t.to_csv(folder_name+'ps_t.csv', mode='a', index=False, header=False)
