@@ -22,7 +22,7 @@ def parse_args():
     scales = [4, 8, 16, 32]
     noises = [0, 10, 40]
     tasks = ['Naive_Compression', 'DCT_Compression', 'Bicubic']
-    
+
     if args.GAN not in GANs:
         print('ERROR: GAN not found')
     elif args.scale not in scales:
@@ -68,17 +68,16 @@ def natural_keys(text):
 def main():
     # Read and get command line args
     params = parse_args()
+    
     # Create a list of training/testing images
     img_dir = params['img_dir']
     files = [f for f in listdir(img_dir) if isfile(join(img_dir, f))]
     images = [f for f in files if ('.jpg' or '.png') in f]
     images.sort(key=natural_keys)
+
     # Run the model on each image
     for img in images:
         print('Start reconstruction on ' + img)
-        # parent_path = params['parent_path']
-        # img_folder = search(r'\d+', img).group()
-        # run_model(img=img_dir+'/'+img, parent_path=parent_path, img_folder=img_folder)
         run_model(img, params)
         reset_weights(params['weights_path'])
 
