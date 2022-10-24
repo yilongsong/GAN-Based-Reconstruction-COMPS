@@ -43,8 +43,11 @@ class A():
 
     # return a signal representation of img
     def fft_compression_A(img, mask):
-        signal_fft = torch.fft.fft2(img)
-        return signal_fft * mask # not an image
+        return torch.fft.fft2(img) * mask # not an image
 
     def ifft_compression_A(img):
         return torch.fft.ifft2(img).float()
+
+    def blur_A(img):
+        blur = transforms.GaussianBlur(kernel_size=(51,51), sigma=(9,9))
+        return blur(img[0])

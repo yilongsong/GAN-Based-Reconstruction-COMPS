@@ -41,16 +41,19 @@ class ImageAdaptiveGenerator():
 
         # initialize A
         if A_type == 'Naive':
-            mask = A.render_mask(self.x, scale)
+            mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.simple_compression_A(I, mask)
             self.A_dag = self.A
         elif A_type == 'FFT':
-            mask = A.render_mask(self.x, scale)
+            mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.fft_compression_A(I, mask)
             self.A_dag = lambda I: A.ifft_compression_A(I)
         elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
+        elif A_type == 'Blur':
+            self.A = lambda I: A.blur_A(I)
+            self.A_dag = None
 
         # initialize y with given noise_level
         self.y = self.A(self.x).to(device)
@@ -111,6 +114,7 @@ class ImageAdaptiveGenerator():
             # back-propagation
             loss.backward()
             # update z
+
             optimizer.step()
             # clear gradient in optimizer
             optimizer.zero_grad()
@@ -216,7 +220,8 @@ def run_model(img, params):
     degraded_y = generator.y
 
     # Naive Reconstruction through pseudo-inverse A
-    naive_reconstruction = generator.Naive()
+    if params['A_type'] != 'Blur':
+        naive_reconstruction = generator.Naive()
 
     # Image produced by GAN with the initial z
     GAN_img = generator.GAN()
@@ -225,13 +230,15 @@ def run_model(img, params):
     CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=0.1)
 
     # CSGM-BP
-    CSGM_BP_img = generator.BP()
+    if params['A_type'] != 'Blur':
+        CSGM_BP_img = generator.BP()
 
     # IA
     IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=params['IA_G_learning_rate'])
 
     # IA_BP
-    IA_BP_img = generator.BP()
+    if params['A_type'] != 'Blur':
+        IA_BP_img = generator.BP()
 
     if params['save_images']:
         # Save images

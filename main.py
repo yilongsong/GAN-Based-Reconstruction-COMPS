@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('--scale', type=float, required=False, help='Scale to be used in the task: 4, 8, 16, or 32')
     parser.add_argument('--ratio', type=float, required=False, help='Ratio to be used in the task: 0.1, 0.3, or 0.5')
     parser.add_argument('--noise', type=int, required=True, help='Noise level of y: 0, 10, or 40')
-    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, FFT, or Naive')
+    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, FFT, Naive, and Blur')
     parser.add_argument('--save_images', action='store_true', help='Include this arg if you want to save the result images')
     args = parser.parse_args()
 
@@ -24,7 +24,7 @@ def parse_args():
     scales = [4, 8, 16, 32]
     ratios = [0.1, 0.3, 0.5]
     noises = [0, 10, 40]
-    tasks = ['Naive', 'FFT', 'Bicubic']
+    tasks = ['Naive', 'FFT', 'Bicubic', 'Blur']
 
     if args.GAN not in GANs:
         print('ERROR: GAN not found')
