@@ -12,11 +12,11 @@ from model import run_model
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--GAN', type=str, required=True)
-    parser.add_argument('--scale', type=int, required=True)
-    parser.add_argument('--noise', type=int, required=True)
-    parser.add_argument('--task', type=str, required=True)
-    parser.add_argument('--save_images', action='store_true')
+    parser.add_argument('--GAN', type=str, required=True, help='Type of pre-trained GAN to use: PGGAN or DCGAN')
+    parser.add_argument('--scale', type=int, required=True, help='Scale to be used in the task: 4, 8, 16, or 32')
+    parser.add_argument('--noise', type=int, required=True, help='Noise level of y: 0, 10, or 40')
+    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, DTC_Compression, or NAive_Compression')
+    parser.add_argument('--save_images', action='store_true', help='Include this arg if you want to save the result images')
     args = parser.parse_args()
 
     GANs = ['PGGAN', 'DCGAN']
