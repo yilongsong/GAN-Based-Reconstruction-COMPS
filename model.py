@@ -40,13 +40,14 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0).to(device)
 
         # initialize A
-        if A_type == 'Naive_Compression':
-            mask = A.create_simple_mask(self.x, scale)
+        if A_type == 'Naive':
+            mask = A.render_mask(self.x, scale)
             self.A = lambda I: A.simple_compression_A(I, mask)
             self.A_dag = self.A
-        elif A_type == 'DCT_Compression':
-            self.A = lambda I: A.dct_compression_A(I)
-            self.A_dag = lambda I: A.idct_compression_A(I)
+        elif A_type == 'FFT':
+            mask = A.render_mask(self.x, scale)
+            self.A = lambda I: A.fft_compression_A(I, mask)
+            self.A_dag = lambda I: A.ifft_compression_A(I)
         elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
@@ -105,7 +106,7 @@ class ImageAdaptiveGenerator():
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y, self.A(Gz).to(device))
+            loss = cost(self.y.float(), self.A(Gz).float().to(device))
             CSGM_loss.append(loss.item())
             # back-propagation
             loss.backward()
@@ -158,7 +159,7 @@ class ImageAdaptiveGenerator():
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y, self.A(Gz).to(device))
+            loss = cost(self.y.float(), self.A(Gz).float().to(device))
             IA_loss.append(loss.item())
             # back-propagation
             loss.backward()
@@ -207,7 +208,7 @@ def run_model(img, params):
             x_path=img_path,
             A_type=params['A_type'], 
             noise_level=params['noise_level']/255,
-            scale=1/params['scale'], 
+            scale=params['rate'], 
             result_folder_name=folder_name)
     
     # Orginal "good" image x and degraded image y
@@ -235,7 +236,8 @@ def run_model(img, params):
     if params['save_images']:
         # Save images
         saveImage(original_x, "original_x", folder_name)
-        saveImage(degraded_y, "degraded_y", folder_name)
+        if params['A_type'] != 'FFT':
+            saveImage(degraded_y, "degraded_y", folder_name)
         saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
         saveImage(GAN_img, "GAN_img", folder_name)
         saveImage(CSGM_img, "CSGM_optimized", folder_name)

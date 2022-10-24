@@ -13,22 +13,27 @@ from model import run_model
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--GAN', type=str, required=True, help='Type of pre-trained GAN to use: PGGAN or DCGAN')
-    parser.add_argument('--scale', type=int, required=True, help='Scale to be used in the task: 4, 8, 16, or 32')
+    parser.add_argument('--scale', type=float, required=False, help='Scale to be used in the task: 4, 8, 16, or 32')
+    parser.add_argument('--ratio', type=float, required=False, help='Ratio to be used in the task: 0.1, 0.3, or 0.5')
     parser.add_argument('--noise', type=int, required=True, help='Noise level of y: 0, 10, or 40')
-    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, DTC_Compression, or NAive_Compression')
+    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, FFT, or Naive')
     parser.add_argument('--save_images', action='store_true', help='Include this arg if you want to save the result images')
     args = parser.parse_args()
 
     GANs = ['PGGAN', 'DCGAN']
     scales = [4, 8, 16, 32]
+    ratios = [0.1, 0.3, 0.5]
     noises = [0, 10, 40]
-    tasks = ['Naive_Compression', 'DCT_Compression', 'Bicubic']
+    tasks = ['Naive', 'FFT', 'Bicubic']
 
     if args.GAN not in GANs:
         print('ERROR: GAN not found')
         exit(0)
-    elif args.scale not in scales:
+    elif (args.scale != None) and (args.scale not in scales):
         print('ERROR: scale needs to be 4, 8, 16, or 32')
+        exit(0)
+    elif (args.ratio != None) and (args.ratio not in ratios):
+        print('ERROR: scale needs to be 0.1, 0.3, or 0.5')
         exit(0)
     elif args.noise not in noises:
         print('ERROR: noise level needs to be 0, 10, or 40')
@@ -39,7 +44,7 @@ def parse_args():
 
     params = {
         'GAN': args.GAN,
-        'scale': args.scale,
+        'rate': 1/args.scale if args.scale != None else args.ratio,
         'noise_level': args.noise,
         'A_type': args.task,
         'parent_path': './Results/' + args.GAN + '/' + args.task + '_' \

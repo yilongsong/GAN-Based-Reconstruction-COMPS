@@ -22,13 +22,12 @@ class A():
     def bicubic_downsample_A(img, scale) -> torch.tensor:
         return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic', align_corners=False, antialias=True)
 
-    def create_simple_mask(img, ratio):
-        rows = img.shape[2]
-        cols = img.shape[3]
-        mask = torch.zeros((rows, cols))
-        a = torch.tensor(list(product(range(rows), range(cols))))
-        prob = torch.tensor([1/(rows*cols)]*rows*cols)
-        idx = prob.multinomial(num_samples=int(rows*cols*ratio), replacement=False)
+    def render_mask(img, ratio):
+        size = img.shape[2]
+        mask = torch.zeros((size, size))
+        a = torch.tensor(list(product(range(size), range(size))))
+        prob = torch.tensor([1/(size*size)]*size*size)
+        idx = prob.multinomial(num_samples=int(size*size*ratio), replacement=False)
         for i in a[idx]:
             mask[i[0], i[1]] = 1
         return mask
@@ -41,3 +40,11 @@ class A():
 
     def idct_compression_A(img, ratio=None):
         return dct.idct_2d(img)  # scaled DCT-III done through the last dimension
+
+    # return a signal representation of img
+    def fft_compression_A(img, mask):
+        signal_fft = torch.fft.fft2(img)
+        return signal_fft * mask # not an image
+
+    def ifft_compression_A(img):
+        return torch.fft.ifft2(img).float()
