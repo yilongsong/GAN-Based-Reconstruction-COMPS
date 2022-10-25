@@ -30,23 +30,40 @@ class A():
         idx = prob.multinomial(num_samples=int(size*size*ratio), replacement=False)
         for i in a[idx]:
             mask[i[0], i[1]] = 1
-        return mask
+        mask = mask.unsqueeze(0).unsqueeze(0).unsqueeze(4)
+        return torch.cat((mask, mask), 4)
 
     def simple_compression_A(mask, img):
         return torch.mul(mask, img)
 
-    def dct_compression_A(img, ratio=None):
-        return dct.dct_2d(img)   # DCT-II done through the last dimension
+    def dct_compression_A(img, mask):
+        return dct.idct_2d(dct.dct_2d(img) * mask)  # DCT-II done through the last dimension
 
-    def idct_compression_A(img, ratio=None):
-        return dct.idct_2d(img)  # scaled DCT-III done through the last dimension
+    def idct_compression_A(img):
+        return -1 # scaled DCT-III done through the last dimension
 
-    # return a signal representation of img
-    def fft_compression_A(img, mask):
-        return torch.fft.fft2(img) * mask # not an image
+    def fft_compression_A(x, mask):
+        x_fft_r = torch.view_as_real(torch.fft.fft2(x[:, 0:1, :, :], norm='ortho')).view(1,-1)
+        x_fft_g = torch.view_as_real(torch.fft.fft2(x[:, 1:2, :, :], norm='ortho')).view(1,-1)
+        x_fft_b = torch.view_as_real(torch.fft.fft2(x[:, 2:3, :, :], norm='ortho')).view(1,-1)
+        mask = mask.view(-1)
+        x_masked_r = x_fft_r[:, mask==1]
+        x_masked_g = x_fft_g[:, mask==1]
+        x_masked_b = x_fft_b[:, mask==1]
+        y = torch.cat((x_masked_r.unsqueeze(1), x_masked_g.unsqueeze(1), x_masked_b.unsqueeze(1)), 1)
+        return y
 
-    def ifft_compression_A(img):
-        return torch.fft.ifft2(img).float()
+    def ifft_compression_A(y, mask):
+        shape = mask.shape
+        mask = mask.view(-1)
+        r, g, b = torch.zeros_like(mask), torch.zeros_like(mask), torch.zeros_like(mask)
+        r[mask == 1], g[mask == 1], b[mask == 1] = y[:, 0], y[:, 1], y[:, 2]
+        r, g, b = r.reshape(shape), g.reshape(shape), b.reshape(shape)
+        y_ifft_r = torch.fft.ifft2(torch.view_as_complex(r), norm='ortho').float()
+        y_ifft_g = torch.fft.ifft2(torch.view_as_complex(g), norm='ortho').float()
+        y_ifft_b = torch.fft.ifft2(torch.view_as_complex(b), norm='ortho').float()
+        naive_x = torch.cat((y_ifft_r, y_ifft_g, y_ifft_b), 1)
+        return naive_x
 
     def blur_A(img):
         blur = transforms.GaussianBlur(kernel_size=(51,51), sigma=(9,9))
