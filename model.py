@@ -44,11 +44,11 @@ class ImageAdaptiveGenerator():
             mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.simple_compression_A(I, mask)
             self.A_dag = self.A
-        # elif A_type == 'FFT':
-        #     mask = A.render_mask(self.x, scale).to(device)
-        #     self.A = lambda I: A.fft_compression_A(I, mask)
-        #     self.A_dag = lambda I: A.ifft_compression_A(I)
         elif A_type == 'FFT':
+            mask = A.render_mask(self.x, scale).to(device)
+            self.A = lambda I: A.fft_compression_A(I, mask)
+            self.A_dag = lambda I: A.ifft_compression_A(I)
+        elif A_type == 'DFT':
             mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.dct_compression_A(I, mask)
             self.A_dag = lambda I: A.idct_compression_A(I)
