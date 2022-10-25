@@ -26,7 +26,7 @@ def parse_args():
         'noise_level': args.noise,
         'A_type': args.task,
         'parent_path': './Results/' + args.GAN + '/' + args.task + '_' + str(args.noise) + 'N_' + \
-                        (str(args.scale) if args.scale != None else str(args.ratio)) + 'S/',
+                        (str(args.scale) + 'S/' if args.scale != None else str(args.ratio) + 'R/'),
         'save_images': args.save_images
     }
 
