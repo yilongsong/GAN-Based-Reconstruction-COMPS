@@ -24,7 +24,7 @@ def parse_args():
     scales = [4, 8, 16, 32]
     ratios = [0.1, 0.3, 0.5]
     noises = [0, 10, 40]
-    tasks = ['Naive', 'FFT', 'Bicubic', 'Blur']
+    tasks = ['FFT', 'Bicubic', 'Blur']
 
     if args.GAN not in GANs:
         print('ERROR: GAN not found')

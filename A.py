@@ -19,7 +19,7 @@ class A():
     def __init__(self):
         pass
         
-    def bicubic_downsample_A(img, scale) -> torch.tensor:
+    def bicubic_downsample_A(img, scale):
         return torch.nn.functional.interpolate(img, scale_factor=scale, mode='bicubic', align_corners=False, antialias=True)
 
     def render_mask(img, ratio):
@@ -32,15 +32,6 @@ class A():
             mask[i[0], i[1]] = 1
         mask = mask.unsqueeze(0).unsqueeze(0).unsqueeze(4)
         return torch.cat((mask, mask), 4)
-
-    def simple_compression_A(mask, img):
-        return torch.mul(mask, img)
-
-    def dct_compression_A(img, mask):
-        return dct.idct_2d(dct.dct_2d(img) * mask)  # DCT-II done through the last dimension
-
-    def idct_compression_A(img):
-        return -1 # scaled DCT-III done through the last dimension
 
     def fft_compression_A(x, mask):
         x_fft_r = torch.view_as_real(torch.fft.fft2(x[:, 0:1, :, :], norm='ortho')).view(1,-1)

@@ -40,18 +40,15 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0).to(device)
 
         # initialize A
-        if A_type == 'Naive':
-            mask = A.render_mask(self.x, scale).to(device)
-            self.A = lambda I: A.simple_compression_A(I, mask)
-            self.A_dag = self.A
-        elif A_type == 'FFT':
+        # if A_type == 'Naive':
+        #     mask = A.render_mask(self.x, scale).to(device)
+        #     self.A = lambda I: A.simple_compression_A(I, mask)
+        #     self.A_dag = self.A
+        # el
+        if A_type == 'FFT':
             mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.fft_compression_A(I, mask)
             self.A_dag = lambda I: A.ifft_compression_A(I, mask)
-        elif A_type == 'DFT':
-            mask = A.render_mask(self.x, scale).to(device)
-            self.A = lambda I: A.dct_compression_A(I, mask)
-            self.A_dag = lambda I: A.idct_compression_A(I)
         elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
@@ -123,8 +120,8 @@ class ImageAdaptiveGenerator():
             # clear gradient in optimizer
             optimizer.zero_grad()
             # print out each 10th iterations
-            # if (itr+1) % 100 == 0:
-            print(f"iteration {itr+1}, loss = {loss:.10f}")
+            if (itr+1) % 100 == 0:
+                print(f"iteration {itr+1}, loss = {loss:.10f}")
             # save images every 100th image
             # if (itr+1) % 600 == 0:
             #     saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)

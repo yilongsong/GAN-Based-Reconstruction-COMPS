@@ -31,14 +31,3 @@ from A import A
 I_PIL = Image.open('./Images/CelebA_HQ/4.jpg')
 I = convert_to_tensor(I_PIL)
 x = torch.unsqueeze(I, 0)
-
-mask = A.render_mask(x, 0.7)
-y = A.fft_compression_A(x, mask)
-naive = A.ifft_compression_A(y, mask)
-
-# print(y.shape)
-# print(naive.shape)
-
-
-naivePIL = convert_to_PIL(torch.clamp(naive[0], 0, 1))
-naivePIL.show()
