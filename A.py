@@ -34,10 +34,10 @@ class A():
         return torch.cat((mask, mask), 4)
 
     def fft_compression_A(x, mask):
+        mask = mask.view(-1)
         x_fft_r = torch.view_as_real(torch.fft.fft2(x[:, 0:1, :, :], norm='ortho')).view(1,-1)
         x_fft_g = torch.view_as_real(torch.fft.fft2(x[:, 1:2, :, :], norm='ortho')).view(1,-1)
         x_fft_b = torch.view_as_real(torch.fft.fft2(x[:, 2:3, :, :], norm='ortho')).view(1,-1)
-        mask = mask.view(-1)
         x_masked_r = x_fft_r[:, mask==1]
         x_masked_g = x_fft_g[:, mask==1]
         x_masked_b = x_fft_b[:, mask==1]
