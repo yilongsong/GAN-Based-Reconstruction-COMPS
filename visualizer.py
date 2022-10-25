@@ -56,29 +56,9 @@ def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
     ia_bp_ps, ia_bp_ps_t = PS(original[0], IA_BP[0], device)
 
     # create three dataframes
-    df_psnr = pd.DataFrame({
-        "Bicubic": [bicubic_psnr],
-        "CSGM": [csgm_psnr],
-        "CSGM-BP": [csgm_bp_psnr],
-        "IA": [ia_psnr],
-        "IA-BP": [ia_bp_psnr]
-    })
-
-    df_ps = pd.DataFrame({
-        "Bicubic": [bicubic_ps],
-        "CSGM": [csgm_ps],
-        "CSGM-BP": [csgm_bp_ps],
-        "IA": [ia_ps],
-        "IA-BP": [ia_bp_ps]
-    })
-
-    df_ps_t = pd.DataFrame({
-        "Bicubic": [bicubic_ps_t],
-        "CSGM": [csgm_ps_t],
-        "CSGM-BP": [csgm_bp_ps_t],
-        "IA": [ia_ps_t],
-        "IA-BP": [ia_bp_ps_t]
-    })
+    df_psnr = pd.DataFrame({"Bicubic": [bicubic_psnr], "CSGM": [csgm_psnr], "CSGM-BP": [csgm_bp_psnr], "IA": [ia_psnr], "IA-BP": [ia_bp_psnr]})
+    df_ps = pd.DataFrame({"Bicubic": [bicubic_ps], "CSGM": [csgm_ps], "CSGM-BP": [csgm_bp_ps], "IA": [ia_ps], "IA-BP": [ia_bp_ps]})
+    df_ps_t = pd.DataFrame({"Bicubic": [bicubic_ps_t], "CSGM": [csgm_ps_t], "CSGM-BP": [csgm_bp_ps_t], "IA": [ia_ps_t], "IA-BP": [ia_bp_ps_t]})
 
     #store them as csv's
     df_psnr = df_psnr.round(decimals=3)

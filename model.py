@@ -52,9 +52,6 @@ class ImageAdaptiveGenerator():
         elif A_type == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
-        elif A_type == 'Blur':
-            self.A = lambda I: A.blur_A(I)
-            self.A_dag = None
 
         # initialize y with given noise_level
         self.y = self.A(self.x).to(device)
@@ -221,8 +218,7 @@ def run_model(img, params):
     degraded_y = generator.y
 
     # Naive Reconstruction through pseudo-inverse A
-    if params['A_type'] != 'Blur':
-        naive_reconstruction = generator.Naive()
+    naive_reconstruction = generator.Naive()
 
     # Image produced by GAN with the initial z
     GAN_img = generator.GAN()
@@ -231,23 +227,20 @@ def run_model(img, params):
     CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=0.1)
 
     # CSGM-BP
-    if params['A_type'] != 'Blur':
-        CSGM_BP_img = generator.BP()
+    CSGM_BP_img = generator.BP()
 
     # IA
     IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=params['IA_G_learning_rate'])
 
     # IA_BP
-    if params['A_type'] != 'Blur':
-        IA_BP_img = generator.BP()
+    IA_BP_img = generator.BP()
 
     if params['save_images']:
         # Save images
         saveImage(original_x, "original_x", folder_name)
         if params['A_type'] != 'FFT':
             saveImage(degraded_y, "degraded_y", folder_name)
-        if params['A_type'] != 'Blur':
-            saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
+        saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
         saveImage(GAN_img, "GAN_img", folder_name)
         saveImage(CSGM_img, "CSGM_optimized", folder_name)
         saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
@@ -257,4 +250,4 @@ def run_model(img, params):
         savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to a table
-    # saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)

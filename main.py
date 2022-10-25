@@ -12,43 +12,20 @@ from model import run_model
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--GAN', type=str, required=True, help='Type of pre-trained GAN to use: PGGAN or DCGAN')
-    parser.add_argument('--scale', type=float, required=False, help='Scale to be used in the task: 4, 8, 16, or 32')
-    parser.add_argument('--ratio', type=float, required=False, help='Ratio to be used in the task: 0.1, 0.3, or 0.5')
-    parser.add_argument('--noise', type=int, required=True, help='Noise level of y: 0, 10, or 40')
-    parser.add_argument('--task', type=str, required=True, help='Task to be performed: Bicubic, FFT, Naive, and Blur')
-    parser.add_argument('--save_images', action='store_true', help='Include this arg if you want to save the result images')
+    parser.add_argument('--GAN', type=str, required = True, choices=['PGGAN', 'DCGAN'], help='type of pre-trained GAN: PGGAN or DCGAN')
+    parser.add_argument('--rate', type=float, required=True, choices=[4,8,16,32,0.1,0.3,0.5], help='rate(scale/ratio) of the task. 4, 8, 16, or 32 for scale, and 0.1, 0.3, or 0.5 for compression ratio')
+    parser.add_argument('--noise', type=int, required=True, choices=[0,10,40], help='noise level of y: 0, 10, or 40')
+    parser.add_argument('--task', type=str, required=True, choices=['FFT', 'Bicubic'], help='task to be performed: Bicubic or FFT')
+    parser.add_argument('--save_images', action='store_true', help='include this argument to save the result images')
     args = parser.parse_args()
-
-    GANs = ['PGGAN', 'DCGAN']
-    scales = [4, 8, 16, 32]
-    ratios = [0.1, 0.3, 0.5]
-    noises = [0, 10, 40]
-    tasks = ['FFT', 'Bicubic', 'Blur']
-
-    if args.GAN not in GANs:
-        print('ERROR: GAN not found')
-        exit(0)
-    elif (args.scale != None) and (args.scale not in scales):
-        print('ERROR: scale needs to be 4, 8, 16, or 32')
-        exit(0)
-    elif (args.ratio != None) and (args.ratio not in ratios):
-        print('ERROR: scale needs to be 0.1, 0.3, or 0.5')
-        exit(0)
-    elif args.noise not in noises:
-        print('ERROR: noise level needs to be 0, 10, or 40')
-        exit(0)
-    elif args.task not in tasks:
-        print('ERROR: not a valid task')
-        exit(0)
 
     params = {
         'GAN': args.GAN,
         'rate': 1/args.scale if args.scale != None else args.ratio,
         'noise_level': args.noise,
         'A_type': args.task,
-        'parent_path': './Results/' + args.GAN + '/' + args.task + '_' \
-            + str(args.noise) + 'N_' + str(args.scale) + 'S/',
+        'parent_path': './Results/' + args.GAN + '/' + args.task + '_' + str(args.noise) + 'N_' + \
+                        (str(args.scale) if args.scale != None else str(args.ratio)) + 'S/',
         'save_images': args.save_images
     }
 
