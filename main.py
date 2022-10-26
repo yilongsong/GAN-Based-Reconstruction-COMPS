@@ -30,9 +30,7 @@ def parse_args():
         folder += '_' + (str(args.scale) + 'S' if args.scale != None else str(args.ratio) + 'R')
     folder += ('_CSGM' + str(args.csgm_itr))
     folder += ('_IA' + str(args.ia_itr))
-    if args.test_folder != 'Whole':
-        folder += ('_' + args.test_folder)
-    folder += '/'
+    folder += ('_' + args.test_folder + '/')
 
     # create a dict of parameters
     params = {
