@@ -56,6 +56,6 @@ class A():
         naive_x = torch.cat((y_ifft_r, y_ifft_g, y_ifft_b), 1)
         return naive_x
 
-    def blur_A(img):
-        blur = transforms.GaussianBlur(kernel_size=(51,51), sigma=(9,9))
+    def blur_A(img, kernel):
+        blur = transforms.GaussianBlur(kernel_size=(kernel,kernel))
         return blur(img[0]).unsqueeze(0)
