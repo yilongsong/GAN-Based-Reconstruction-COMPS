@@ -18,7 +18,7 @@ def parse_args():
     parser.add_argument('--ratio', type=float, required=False, choices=[0.1,0.3,0.5,0.7], help='ratio of FFT: 0.1, 0.3, 0.5, or 0.7')
     parser.add_argument('--noise', type=int, required=True, choices=[0,10,40], help='noise level of y: 0, 10, or 40')
     parser.add_argument('--task', type=str, required=True, choices=['FFT', 'Bicubic', 'Blur'], help='task to be performed: FFT, Bicubic, or Blur')
-    parser.add_argument('--skip_csgm', action='store_true', help='include this argument to save the result images')
+    parser.add_argument('--skip_csgm', action='store_true', help='include this argument to skip csgm step')
     parser.add_argument('--save_images', action='store_true', help='include this argument to save the result images')
     args = parser.parse_args()
 
