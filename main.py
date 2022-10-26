@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('--GAN', type=str, required = True, choices=['PGGAN'], help='type of pre-trained GAN: PGGAN')
     parser.add_argument('--scale', type=int, required=False, choices=[4,8,16,32], help='scale of Bicubic: 4, 8, 16, or 32 for scale')
     parser.add_argument('--ratio', type=float, required=False, choices=[0.1,0.3,0.5,0.7], help='ratio of FFT: 0.1, 0.3, 0.5, or 0.7')
-    parser.add_argument('--kernel', type=float, required=False, choices=[1,9,51], help='kernel size for Blur: 1, 9, or 51')
+    parser.add_argument('--kernel', type=int, required=False, choices=[1,9,51], help='kernel size for Blur: 1, 9, or 51')
     parser.add_argument('--noise', type=int, required=True, choices=[0,10,40], help='noise level of y: 0, 10, or 40')
     parser.add_argument('--task', type=str, required=True, choices=['FFT', 'Bicubic', 'Blur'], help='task to be performed: FFT, Bicubic, or Blur')
     parser.add_argument('--csgm_itr', type=int, required=True, choices=[0,500,1000,1500,1800], help='number of iterations for CSGM')
