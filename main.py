@@ -99,10 +99,10 @@ def main():
     # Run the model on each image
     num_img_saved = 0
     for img in images:
-        print('Start reconstruction on ' + img)
         if num_img_saved >= 5:
             params['save_images'] = False
         if img[:-4] in test_folder:
+            print('Start reconstruction on ' + img)
             run_model(img, params)
             reset_weights(params['weights_path'])
             num_img_saved += 1
