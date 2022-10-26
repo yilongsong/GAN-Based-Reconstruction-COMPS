@@ -38,27 +38,35 @@ def savePlot(CSGM_data, IA_data, folder_name):
 '''
     Crate and save the table
 '''
-def saveTable(original, Bicubic, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
-    # Bicubic
-    bicubic_psnr = PSNR(original[0], Bicubic[0], device)
-    bicubic_ps, bicubic_ps_t = PS(original[0], Bicubic[0], device)
+def saveTable(original, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
+    # Naive
+    if Naive != None:
+        naive_psnr = PSNR(original[0], Naive[0], device)
+        naive_ps, naive_ps_t = PS(original[0], Naive[0], device)
     # CSGM
     csgm_psnr = PSNR(original[0], CSGM[0], device)
     csgm_ps, csgm_ps_t = PS(original[0], CSGM[0], device)
     # CSGM BP
-    csgm_bp_psnr = PSNR(original[0], CSGM_BP[0], device)
-    csgm_bp_ps, csgm_bp_ps_t = PS(original[0], CSGM_BP[0], device)
+    if CSGM_BP != None:
+        csgm_bp_psnr = PSNR(original[0], CSGM_BP[0], device)
+        csgm_bp_ps, csgm_bp_ps_t = PS(original[0], CSGM_BP[0], device)
     # IA
     ia_psnr = PSNR(original[0], IA[0], device)
     ia_ps, ia_ps_t = PS(original[0], IA[0], device)
     # IA BP
-    ia_bp_psnr = PSNR(original[0], IA_BP[0], device)
-    ia_bp_ps, ia_bp_ps_t = PS(original[0], IA_BP[0], device)
+    if CSGM_BP != None:
+        ia_bp_psnr = PSNR(original[0], IA_BP[0], device)
+        ia_bp_ps, ia_bp_ps_t = PS(original[0], IA_BP[0], device)
 
     # create three dataframes
-    df_psnr = pd.DataFrame({"Bicubic": [bicubic_psnr], "CSGM": [csgm_psnr], "CSGM-BP": [csgm_bp_psnr], "IA": [ia_psnr], "IA-BP": [ia_bp_psnr]})
-    df_ps = pd.DataFrame({"Bicubic": [bicubic_ps], "CSGM": [csgm_ps], "CSGM-BP": [csgm_bp_ps], "IA": [ia_ps], "IA-BP": [ia_bp_ps]})
-    df_ps_t = pd.DataFrame({"Bicubic": [bicubic_ps_t], "CSGM": [csgm_ps_t], "CSGM-BP": [csgm_bp_ps_t], "IA": [ia_ps_t], "IA-BP": [ia_bp_ps_t]})
+    if Naive != None:
+        df_psnr = pd.DataFrame({"Naive": [naive_psnr], "CSGM": [csgm_psnr], "CSGM-BP": [csgm_bp_psnr], "IA": [ia_psnr], "IA-BP": [ia_bp_psnr]})
+        df_ps = pd.DataFrame({"Naive": [naive_ps], "CSGM": [csgm_ps], "CSGM-BP": [csgm_bp_ps], "IA": [ia_ps], "IA-BP": [ia_bp_ps]})
+        df_ps_t = pd.DataFrame({"Naive": [naive_ps_t], "CSGM": [csgm_ps_t], "CSGM-BP": [csgm_bp_ps_t], "IA": [ia_ps_t], "IA-BP": [ia_bp_ps_t]})
+    else:
+        df_psnr = pd.DataFrame({"CSGM": [csgm_psnr], "IA": [ia_psnr]})
+        df_ps = pd.DataFrame({"CSGM": [csgm_ps], "IA": [ia_ps]})
+        df_ps_t = pd.DataFrame({"CSGM": [csgm_ps_t], "IA": [ia_ps_t]})
 
     #store them as csv's
     df_psnr = df_psnr.round(decimals=3)

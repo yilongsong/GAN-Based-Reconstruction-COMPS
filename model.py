@@ -16,7 +16,7 @@ from visualizer import savePlot, saveImage, saveTable
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ImageAdaptiveGenerator():
-    def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, A_type, scale, noise_level, result_folder_name):
+    def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, task, scale, noise_level, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator().to(device)
@@ -40,16 +40,11 @@ class ImageAdaptiveGenerator():
         self.x = torch.unsqueeze(convert_to_tensor(x_PIL), 0).to(device)
 
         # initialize A
-        # if A_type == 'Naive':
-        #     mask = A.render_mask(self.x, scale).to(device)
-        #     self.A = lambda I: A.simple_compression_A(I, mask)
-        #     self.A_dag = self.A
-        # el
-        if A_type == 'FFT':
+        if task == 'FFT':
             mask = A.render_mask(self.x, scale).to(device)
             self.A = lambda I: A.fft_compression_A(I, mask)
             self.A_dag = lambda I: A.ifft_compression_A(I, mask)
-        elif A_type == 'Bicubic':
+        elif task == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
 
@@ -203,51 +198,61 @@ def run_model(img, params):
 
     # Instanciate our IAGAN
     generator = ImageAdaptiveGenerator(
-            GAN_type=params['GAN'], 
-            CSGM_optimizer="ADAM", 
-            IA_optimizer_z="ADAM", 
-            IA_optimizer_G="ADAM",
-            x_path=img_path,
-            A_type=params['A_type'], 
-            noise_level=params['noise_level']/255,
-            scale=params['rate'], 
-            result_folder_name=folder_name)
+        GAN_type=params['GAN'], 
+        CSGM_optimizer="ADAM", 
+        IA_optimizer_z="ADAM", 
+        IA_optimizer_G="ADAM",
+        x_path=img_path,
+        task=params['task'], 
+        noise_level=params['noise_level'],
+        scale=params['rate'], 
+        result_folder_name=folder_name)
     
     # Orginal "good" image x and degraded image y
     original_x = generator.x
     degraded_y = generator.y
 
     # Naive Reconstruction through pseudo-inverse A
-    naive_reconstruction = generator.Naive()
+    if params['task'] != 'Blur':
+        naive_reconstruction = generator.Naive()
 
     # Image produced by GAN with the initial z
     GAN_img = generator.GAN()
     
     # CSGM 
-    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=0.1)
+    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=params['CSGM_lr'])
 
     # CSGM-BP
-    CSGM_BP_img = generator.BP()
+    if params['task'] != 'Blur':
+        CSGM_BP_img = generator.BP()
 
     # IA
-    IA_img, IA_data = generator.IA(IA_iteration_number=300, IA_z_learning_rate=0.0001, IA_G_learning_rate=params['IA_G_learning_rate'])
+    IA_img, IA_data = generator.IA(IA_iteration_number=params['IA_itr'], IA_z_learning_rate=params['IA_z_lr'], IA_G_learning_rate=params['IA_G_lr'])
 
     # IA_BP
-    IA_BP_img = generator.BP()
+    if params['task'] != 'Blur':
+        IA_BP_img = generator.BP()
 
+    # Save images
     if params['save_images']:
-        # Save images
         saveImage(original_x, "original_x", folder_name)
-        if params['A_type'] != 'FFT':
+        if params['task'] != 'FFT':
             saveImage(degraded_y, "degraded_y", folder_name)
-        saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
+        if params['task'] != 'Blur':
+            saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
         saveImage(GAN_img, "GAN_img", folder_name)
         saveImage(CSGM_img, "CSGM_optimized", folder_name)
-        saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
+        if params['task'] != 'Blur':
+            saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
         saveImage(IA_img, "IA_optimized", folder_name)
-        saveImage(IA_BP_img, "IA_BP", folder_name)
+        if params['task'] != 'Blur':
+            saveImage(IA_BP_img, "IA_BP", folder_name)
         # Save data as line graphs
         savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to a table
-    saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+    if params['task'] == 'Blur':
+        saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
+    else:
+        saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+        
