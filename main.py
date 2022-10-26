@@ -28,8 +28,8 @@ def parse_args():
     folder = './Results/' + args.GAN + '/' + args.task + '_' + str(args.noise) + 'N'
     if args.task != 'Blur':
         folder += '_' + (str(args.scale) + 'S' if args.scale != None else str(args.ratio) + 'R')
-    if args.csgm_itr > 0:
-        folder += ('_CSGM' + str(args.csgm_itr))
+    folder += ('_CSGM' + str(args.csgm_itr))
+    folder += ('_IA' + str(args.ia_itr))
     if args.test_folder != 'Whole':
         folder += ('_' + args.test_folder)
     folder += '/'
@@ -41,7 +41,7 @@ def parse_args():
         'noise_level': args.noise/255,
         'task': args.task,
         'CSGM_itr': args.csgm_itr,
-        'IA_itr': args.is_itr,
+        'IA_itr': args.ia_itr,
         'parent_path': folder,
         'test_folder': args.test_folder,
         'skip_csgm': True if args.csgm_itr == 0 else False,
