@@ -29,7 +29,7 @@ def parse_args():
     if args.task != 'Blur':
         folder += '_' + (str(args.scale) + 'S' if args.scale != None else str(args.ratio) + 'R')
     if args.skip_csgm:
-        folder += ('_CSGM' + str(args.csgm_itr)
+        folder += ('_CSGM' + str(args.csgm_itr))
     if args.test_folder != 'Whole':
         folder += ('_' + args.test_folder)
     folder += '/'
