@@ -24,7 +24,7 @@ def saveImage(img, file_name, folder_name, format='.jpg'):
     Create and save the plot
 '''
 def savePlot(CSGM_data, IA_data, folder_name):
-    print('Processing data to create plots and tables....')
+    print('Processing data to create a plot....')
     IA_x_axis = [i + len(CSGM_data[0]) for i in range(len(IA_data[0]))]  
     plt.clf() 
     plt.plot(CSGM_data[0], CSGM_data[1], color='red')
@@ -34,11 +34,13 @@ def savePlot(CSGM_data, IA_data, folder_name):
     plt.grid(True)
     path = folder_name+'/plot.png'
     plt.savefig(path)
+    print('Plot generated')
 
 '''
     Crate and save the table
 '''
 def saveTable(original, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
+    print('Processing data to create tables....')
     # dicts for storing data
     psnr, ps, ps_t = {}, {}, {}
 
@@ -77,3 +79,5 @@ def saveTable(original, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
     df_psnr.to_csv(folder_name+'psnr.csv', mode='a', index=False, header=False)
     df_ps.to_csv(folder_name+'ps.csv', mode='a', index=False, header=False)
     df_ps_t.to_csv(folder_name+'ps_t.csv', mode='a', index=False, header=False)
+
+    print('Tables Generated')

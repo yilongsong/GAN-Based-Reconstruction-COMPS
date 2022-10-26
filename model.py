@@ -187,8 +187,10 @@ class ImageAdaptiveGenerator():
     '''
     def BP(self):
         #enforce compliance
+        print("Launching BP:")
         xhat = self.G(self.z)
         xhat = torch.add(self.A_dag((torch.sub(self.y, self.A(xhat)))), xhat)
+        print("BP complete")
         return xhat
 
 '''
@@ -253,17 +255,20 @@ def run_model(img, params):
         if params['task'] != 'Blur':
             saveImage(IA_BP_img, "IA_BP", folder_name)
         # Save data as line graphs
-        savePlot(CSGM_data, IA_data, folder_name)
+        if params['skip_csgm'] == False:
+            savePlot(CSGM_data, IA_data, folder_name)
 
-    # Save data to a table
+    # Save data to tables
     if params['task'] == 'Blur':
-        if params['skip_csgm']:
-            saveTable(original_x, None, None, None, IA_img, None, params['parent_path'], device)
-        else:
+        if params['skip_csgm'] == False:
             saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
-    else:
-        if params['skip_csgm']:
-            saveTable(original_x, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
         else:
+            saveTable(original_x, None, None, None, IA_img, None, params['parent_path'], device)
+            
+    else:
+        if params['skip_csgm'] == False:
             saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+        else:
+            saveTable(original_x, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
+            
         
