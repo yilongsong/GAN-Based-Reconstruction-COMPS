@@ -39,11 +39,16 @@ def savePlot(CSGM_data, IA_data, folder_name):
 '''
     Crate and save the table
 '''
-def saveTable(original, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
+def saveTable(original, degraded, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
     print('Processing data to create tables....')
     # dicts for storing data
     psnr, ps, ps_t = {}, {}, {}
 
+    # Degraded
+    if degraded != None:
+        y_psnr = PSNR(original[0], degraded[0], device)
+        y_ps, y_ps_t = PS(original[0], degraded[0], device)
+        psnr['Degraded'], ps['Degraded'], ps_t['degraded'] = [y_psnr], [y_ps], [y_ps_t]
     # Naive
     if Naive != None:
         naive_psnr = PSNR(original[0], Naive[0], device)

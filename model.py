@@ -261,14 +261,14 @@ def run_model(img, params):
     # Save data to tables
     if params['task'] == 'Blur':
         if params['skip_csgm'] == False:
-            saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
+            saveTable(original_x, degraded_y, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
         else:
-            saveTable(original_x, None, None, None, IA_img, None, params['parent_path'], device)
+            saveTable(original_x, degraded_y, None, None, None, IA_img, None, params['parent_path'], device)
             
     else:
         if params['skip_csgm'] == False:
-            saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+            saveTable(original_x, None, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
         else:
-            saveTable(original_x, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
+            saveTable(original_x, None, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
             
         
