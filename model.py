@@ -263,7 +263,7 @@ def run_model(img, params):
             saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
     else:
         if params['skip_csgm']:
-            saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
-        else:
             saveTable(original_x, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
+        else:
+            saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
         
