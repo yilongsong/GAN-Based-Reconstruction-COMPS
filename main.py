@@ -28,7 +28,7 @@ def parse_args():
     folder = './Results/' + args.GAN + '/' + args.task + '_' + str(args.noise) + 'N'
     if args.task != 'Blur':
         folder += '_' + (str(args.scale) + 'S' if args.scale != None else str(args.ratio) + 'R')
-    if args.skip_csgm:
+    if args.csgm_itr > 0:
         folder += ('_CSGM' + str(args.csgm_itr))
     if args.test_folder != 'Whole':
         folder += ('_' + args.test_folder)
