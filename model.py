@@ -47,6 +47,9 @@ class ImageAdaptiveGenerator():
         elif task == 'Bicubic':
             self.A = lambda I: A.bicubic_downsample_A(I, scale)
             self.A_dag = lambda I: A.bicubic_downsample_A(I, 1/scale)
+        elif task == 'Blur':
+            self.A = lambda I: A.blur_A(I)
+            self.A_dag = None
 
         # initialize y with given noise_level
         self.y = self.A(self.x).to(device)
