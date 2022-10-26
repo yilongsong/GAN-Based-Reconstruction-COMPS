@@ -35,6 +35,7 @@ def parse_args():
         'noise_level': args.noise/255,
         'task': args.task,
         'parent_path': folder,
+        'skip_csgm': args.skip_csgm,
         'save_images': args.save_images
     }
 
@@ -44,12 +45,9 @@ def parse_args():
         params['weights_path'] = 'PGGAN_weights.pth'
         params['CSGM_itr'] = 1800
         params['CSGM_lr'] = 0.1
-        params['IA_itr'] = 1800 if args.skip_csgm else (500 if args.task == 'FFT' else 300) 
+        params['IA_itr'] =  1800 + (500 if args.task == 'FFT' else 300) if args.skip_csgm else (500 if args.task == 'FFT' else 300)
         params['IA_z_lr'] = 0.0001
         params['IA_G_lr'] = 0.001
-    
-    print(params['IA_itr'])
-    exit()
 
     return params
 

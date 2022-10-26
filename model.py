@@ -222,12 +222,13 @@ def run_model(img, params):
     # Image produced by GAN with the initial z
     GAN_img = generator.GAN()
     
-    # CSGM 
-    CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=params['CSGM_lr'])
+    if params['skip_csgm'] == False:
+        # CSGM 
+        CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=params['CSGM_lr'])
 
-    # CSGM-BP
-    if params['task'] != 'Blur':
-        CSGM_BP_img = generator.BP()
+        # CSGM-BP
+        if params['task'] != 'Blur':
+            CSGM_BP_img = generator.BP()
 
     # IA
     IA_img, IA_data = generator.IA(IA_iteration_number=params['IA_itr'], IA_z_learning_rate=params['IA_z_lr'], IA_G_learning_rate=params['IA_G_lr'])
@@ -244,9 +245,10 @@ def run_model(img, params):
         if params['task'] != 'Blur':
             saveImage(naive_reconstruction, "naive_reconstruction", folder_name)
         saveImage(GAN_img, "GAN_img", folder_name)
-        saveImage(CSGM_img, "CSGM_optimized", folder_name)
-        if params['task'] != 'Blur':
-            saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
+        if params['skip_csgm'] == False:
+            saveImage(CSGM_img, "CSGM_optimized", folder_name)
+            if params['task'] != 'Blur':
+                saveImage(CSGM_BP_img, "CSGM_BP", folder_name)
         saveImage(IA_img, "IA_optimized", folder_name)
         if params['task'] != 'Blur':
             saveImage(IA_BP_img, "IA_BP", folder_name)
@@ -255,7 +257,13 @@ def run_model(img, params):
 
     # Save data to a table
     if params['task'] == 'Blur':
-        saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
+        if params['skip_csgm']:
+            saveTable(original_x, None, None, None, IA_img, None, params['parent_path'], device)
+        else:
+            saveTable(original_x, None, CSGM_img, None, IA_img, None, params['parent_path'], device)
     else:
-        saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+        if params['skip_csgm']:
+            saveTable(original_x, naive_reconstruction, CSGM_img, CSGM_BP_img, IA_img, IA_BP_img, params['parent_path'], device)
+        else:
+            saveTable(original_x, naive_reconstruction, None, None, IA_img, IA_BP_img, params['parent_path'], device)
         
