@@ -58,4 +58,4 @@ class A():
 
     def blur_A(img):
         blur = transforms.GaussianBlur(kernel_size=(51,51), sigma=(9,9))
-        return blur(img[0])
+        return blur(img[0]).unsqueeze(0)
