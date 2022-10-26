@@ -26,6 +26,8 @@ def parse_args():
     folder = './Results/' + args.GAN + '/' + args.task + '_' + str(args.noise) + 'N'
     if args.task != 'Blur':
         folder += '_' + (str(args.scale) + 'S' if args.scale != None else str(args.ratio) + 'R')
+    if args.skip_csgm:
+        folder += '_Skip'
     folder += '/'
 
     # create a dict of parameters
