@@ -79,6 +79,8 @@ def get_test_folder(folder):
         return ['7','31','38','39','42','50','90','100','101','102']
     elif folder == 'LightSkin':
         return ['2','3','4','5','6','8','9','10','11']
+    elif folder == 'Test':
+        return ['15']
 
 def reset_weights(weights_path):
     src_path = './saved_weights/' + weights_path
@@ -114,7 +116,6 @@ def main():
             run_model(img, params)
             reset_weights(params['weights_path'])
             num_img_saved += 1
-        break
 
 if __name__ == '__main__':
     main()
