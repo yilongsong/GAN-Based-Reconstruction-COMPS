@@ -82,9 +82,7 @@ def saveTable(original, degraded, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, 
 
     #store them as csv's
     if not os.path.exists(folder_name+'psnr.csv'):
-        os.makedirs(folder_name+'psnr.csv')
-        os.makedirs(folder_name+'ps.csv')
-        os.makedirs(folder_name+'ps_t.csv')
+        os.makedirs(folder_name)
     df_psnr.to_csv(folder_name+'psnr.csv', mode='a', index=False, header=False)
     df_ps.to_csv(folder_name+'ps.csv', mode='a', index=False, header=False)
     df_ps_t.to_csv(folder_name+'ps_t.csv', mode='a', index=False, header=False)
