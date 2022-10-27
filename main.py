@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('--task', type=str, required=True, choices=['FFT', 'Bicubic', 'Blur'], help='task to be performed: FFT, Bicubic, or Blur')
     parser.add_argument('--csgm_itr', type=int, required=True, choices=[0,500,1000,1500,1800], help='number of iterations for CSGM')
     parser.add_argument('--ia_itr', type=int, required=True, choices=[300,500,600,800,1100,1300,2100,2300], help='number of iterations for IA')
-    parser.add_argument('--test_folder', type=str, required=True, choices=['Whole', 'Object', 'DarkHair', 'LightHair', 'NoHair', 'DarkSkin', 'LightSkin'], help='folder of images that you want to run this model on')
+    parser.add_argument('--test_folder', type=str, required=True, choices=['Whole', 'Object', 'DarkHair', 'LightHair', 'NoHair', 'DarkSkin', 'LightSkin', 'Test'], help='folder of images that you want to run this model on')
     parser.add_argument('--save_images', action='store_true', help='include this argument to save the result images')
     args = parser.parse_args()
 
