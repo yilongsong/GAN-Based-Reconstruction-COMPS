@@ -214,9 +214,6 @@ def run_model(img, params):
         saveImage(IA_img, "IA_optimized", folder_name)
         if params['task'] != 'Blur':
             saveImage(IA_BP_img, "IA_BP", folder_name)
-        # Save data as line graphs
-        # if params['skip_csgm'] == False:
-        #     savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to tables
     if params['task'] == 'Blur':
