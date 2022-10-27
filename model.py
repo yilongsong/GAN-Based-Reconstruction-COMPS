@@ -11,7 +11,7 @@ https://neptune.ai/blog/pytorch-loss-functions
 
 from A import A
 from PGGAN import Generator
-from visualizer import savePlot, saveImage, saveTable
+from visualizer import saveImage, saveTable
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
