@@ -16,7 +16,7 @@ from visualizer import savePlot, saveImage, saveTable
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ImageAdaptiveGenerator():
-    def __init__(self, GAN_type, CSGM_optimizer, IA_optimizer_z, IA_optimizer_G, x_path, task, scale, noise_level, result_folder_name):
+    def __init__(self, GAN_type, x_path, task, scale, noise_level, result_folder_name):
         # initialize pre-trained GAN with saved weights in "weights" folder
         if GAN_type == 'PGGAN':
             self.G = Generator().to(device)
@@ -26,13 +26,6 @@ class ImageAdaptiveGenerator():
         # initialize z with normal distribution (0,1) in a form that can be updated by torch
         z_init = torch.normal(mean=0.0, std=1.0, size=(1,512,1,1)).to(device)
         self.z = torch.autograd.Variable(z_init, requires_grad = True)
-
-        # initialize CSGM optimizer
-        self.CSGM_optimizer = CSGM_optimizer
-
-        #initialize IA optimizer 
-        self.IA_optimizer_z = IA_optimizer_z
-        self.IA_optimizer_G = IA_optimizer_G
 
         # initialize x
         convert_to_tensor = transforms.ToTensor()
@@ -85,45 +78,30 @@ class ImageAdaptiveGenerator():
     def CSGM(self, csgm_iteration_number, csgm_learning_rate):
         print("Launching CSGM optimization:")
     
-        # arrays that store data from CSGM
-        CSGM_itr = [i for i in range(csgm_iteration_number)]
-        CSGM_loss = []
-    
         # define the cost function
-        cost = nn.MSELoss().to(device)
+        cost = nn.MSELoss()
         # define the optimizer
-        if self.CSGM_optimizer == "SGD":
-            optimizer = torch.optim.SGD(params=[self.z], lr=csgm_learning_rate)
-        elif self.CSGM_optimizer == "ADAM":
-            optimizer = torch.optim.Adam(params=[self.z], lr=csgm_learning_rate)
-        else:
-            print('ERROR: CSGM optimizer not found')
-            exit(0)
+        optimizer = torch.optim.Adam(params=[self.z], lr=csgm_learning_rate)
 
         # CSGM training starts here
         for itr in range(csgm_iteration_number):
+            # clear gradient in optimizer
+            optimizer.zero_grad()
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y.float(), self.A(Gz).float().to(device))
-            CSGM_loss.append(loss.item())
+            loss = cost(self.y, self.A(Gz))
             # back-propagation
             loss.backward()
             # update z
-
             optimizer.step()
-            # clear gradient in optimizer
-            optimizer.zero_grad()
             # print out each 10th iterations
             if (itr+1) % 100 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}")
-            # save images every 100th image
-            # if (itr+1) % 600 == 0:
-            #     saveImage(self.G(self.z), "CSGM_"+str(itr+1), self.result_folder_name)
 
         CSGM_img = self.G(self.z)
         print("CSGM completed")
-        return CSGM_img, [CSGM_itr, CSGM_loss]
+        return CSGM_img
 
     '''
         Perform IA given the number of iteration and learning rates
@@ -135,50 +113,35 @@ class ImageAdaptiveGenerator():
     '''
     def IA(self, IA_iteration_number, IA_z_learning_rate, IA_G_learning_rate):
         print("Launching IA optimization:")
-        # arrays that store data from IA
-        IA_itr = [i for i in range(IA_iteration_number)]
-        IA_loss = []
 
         # define the cost function
-        cost = nn.MSELoss().to(device)
+        cost = nn.MSELoss()
         # define the optimizer for z (as of now, ADAM only)
-        if self.IA_optimizer_z == "ADAM":
-            optimizer_z = torch.optim.Adam(params=[self.z], lr=IA_z_learning_rate)
-        else:
-            print('ERROR: CSGM optimizer for z not found')
-            exit(0)
+        optimizer_z = torch.optim.Adam(params=[self.z], lr=IA_z_learning_rate)
         # define the optimizer for G (as of now ADAM only)
-        if self.IA_optimizer_G == "ADAM":
-            optimizer_G = torch.optim.Adam(params=self.G.parameters(), lr=IA_G_learning_rate)
-        else:
-            print('ERROR: IA optimizer for G not found')
-            exit(0)
+        optimizer_G = torch.optim.Adam(params=self.G.parameters(), lr=IA_G_learning_rate)
 
         # IA steps here
         for itr in range(IA_iteration_number):
+            # clear gradient in optimizer
+            optimizer_z.zero_grad()
+            optimizer_G.zero_grad()
             # generate an image from the current z
             Gz = self.G(self.z)
             # create the loss function
-            loss = cost(self.y.float(), self.A(Gz).float().to(device))
-            IA_loss.append(loss.item())
+            loss = cost(self.y, self.A(Gz))
             # back-propagation
             loss.backward()
             # update z and G's params
             optimizer_z.step()
             optimizer_G.step()
-            # clear gradient in optimizer
-            optimizer_z.zero_grad()
-            optimizer_G.zero_grad()
             # print out each 100th iterations
             if (itr+1) % 100 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}") 
-            # save images every 100th image
-            # if (itr+1) % 100 == 0:
-            #     saveImage(self.G(self.z), "IA_"+str(itr+1), self.result_folder_name)
 
         IA_img = self.G(self.z)
         print("IA completed")
-        return IA_img, [IA_itr, IA_loss]
+        return IA_img
 
     '''
         Perform BP through A_dag
@@ -204,9 +167,6 @@ def run_model(img, params):
     # Instanciate our IAGAN
     generator = ImageAdaptiveGenerator(
         GAN_type=params['GAN'], 
-        CSGM_optimizer="ADAM", 
-        IA_optimizer_z="ADAM", 
-        IA_optimizer_G="ADAM",
         x_path=img_path,
         task=params['task'], 
         noise_level=params['noise_level'],
@@ -226,14 +186,14 @@ def run_model(img, params):
     
     if params['skip_csgm'] == False:
         # CSGM 
-        CSGM_img, CSGM_data = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=params['CSGM_lr'])
+        CSGM_img = generator.CSGM(csgm_iteration_number=params['CSGM_itr'], csgm_learning_rate=params['CSGM_lr'])
 
         # CSGM-BP
         if params['task'] != 'Blur':
             CSGM_BP_img = generator.BP()
 
     # IA
-    IA_img, IA_data = generator.IA(IA_iteration_number=params['IA_itr'], IA_z_learning_rate=params['IA_z_lr'], IA_G_learning_rate=params['IA_G_lr'])
+    IA_img = generator.IA(IA_iteration_number=params['IA_itr'], IA_z_learning_rate=params['IA_z_lr'], IA_G_learning_rate=params['IA_G_lr'])
 
     # IA_BP
     if params['task'] != 'Blur':
@@ -255,8 +215,8 @@ def run_model(img, params):
         if params['task'] != 'Blur':
             saveImage(IA_BP_img, "IA_BP", folder_name)
         # Save data as line graphs
-        if params['skip_csgm'] == False:
-            savePlot(CSGM_data, IA_data, folder_name)
+        # if params['skip_csgm'] == False:
+        #     savePlot(CSGM_data, IA_data, folder_name)
 
     # Save data to tables
     if params['task'] == 'Blur':

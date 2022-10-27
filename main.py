@@ -114,6 +114,7 @@ def main():
             run_model(img, params)
             reset_weights(params['weights_path'])
             num_img_saved += 1
+        break
 
 if __name__ == '__main__':
     main()
