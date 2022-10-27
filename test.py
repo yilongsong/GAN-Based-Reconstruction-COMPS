@@ -41,5 +41,11 @@ def get_average_results(folder):
     get_info(folder+'ps_t.csv')
     get_info(folder+'ps.csv')
     get_info(folder+'psnr.csv')
+    print('********************')
 
-get_average_results('./Results/PGGAN/Bicubic_0N_8S/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_Object/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_DarkHair/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_LightHair/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_NoHair/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_DarkSkin/')
+get_average_results('./Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_LightSkin/')
