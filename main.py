@@ -9,6 +9,7 @@ from re import split
 from os import listdir, remove
 from os.path import isfile, join
 from model import run_model
+from visualizer import get_summary
 
 def parse_args():
     # parse command line args
@@ -114,6 +115,8 @@ def main():
             run_model(img, params)
             reset_weights(params['weights_path'])
             num_img_saved += 1
+
+    get_summary(params['test_folder'])
 
 if __name__ == '__main__':
     main()

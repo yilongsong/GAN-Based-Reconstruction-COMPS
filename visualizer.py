@@ -5,6 +5,7 @@ from PIL import Image
 import pandas as pd
 from evaluate import PSNR, PS
 import torch
+import csv
 
 '''
     Save the input image to a specified folder
@@ -67,3 +68,27 @@ def saveTable(original, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, device):
     df_ps_t.to_csv(folder_name+'ps_t.csv', mode='a', index=False, header=False)
 
     print('Tables Generated')
+
+def get_summary(folder):
+    data_summary = []
+    def get_info(path):
+        file = csv.reader(open(path, 'r'))
+        count = 0
+        sum = [0.0, 0.0, 0.0, 0.0, 0.0]
+        for row in file:
+            count += 1
+            for i in range(len(row)):
+                sum[i] += float(row[i])
+        avg = [round(sum[i]/count,3) for i in range(len(sum))]
+        data_summary.append(avg)
+
+    get_info(folder+'ps_t.csv')
+    get_info(folder+'ps.csv')
+    get_info(folder+'psnr.csv')
+
+    with open(folder+'summary.csv', 'w') as file:
+        writer = csv.writer(file)
+        for line in data_summary:
+            writer.writerow(line)
+
+
