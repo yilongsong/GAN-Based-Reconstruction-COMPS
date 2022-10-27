@@ -68,17 +68,17 @@ def get_test_folder(folder):
     if folder == 'Whole':
         return [str(i) for i in range(0, 100)]
     elif folder == 'Object':
-        return ['7', '11', '45', '47', '48', '61', '66', '69', '73', '74']
+        return ['7','11','45','47','48','61','66','69','73','74']
     elif folder == 'DarkHair':
-        return ['4', '5', '6', '10', '15', '16', '18', '50', '51', '55']
+        return ['4','5','6','10','15','16','18','50','51','55']
     elif folder == 'LightHair':
-        return ['0', '1', '3', '7', '12', '13', '46', '62', '76', '92']
+        return ['0','1','3','7','12','13','46','62','76','92']
     elif folder == 'NoHair':
-        return ['15', '30', '45', '47', '59', '89']
+        return ['15','30','45','47','59','89','103','104','105','106']
     elif folder == 'DarkSkin':
-        return ['7', '31', '38', '39', '42', '50', '90', '100', '101', '102']
+        return ['7','31','38','39','42','50','90','100','101','102']
     elif folder == 'LightSkin':
-        return [str(i) for i in range(0, 10)]
+        return ['2','3','4','5','6','8','9','10','11']
 
 def reset_weights(weights_path):
     src_path = './saved_weights/' + weights_path
