@@ -16,7 +16,7 @@ def saveImage(img, file_name, folder_name, format='.jpg'):
     path = folder_name+'/'
     # Create folder if folder doesn't already exist
     if not os.path.exists(path):
-            os.makedirs(path)
+        os.makedirs(path)
     image.save(path+file_name+format)
     return image
 
@@ -81,6 +81,10 @@ def saveTable(original, degraded, Naive, CSGM, CSGM_BP, IA, IA_BP, folder_name, 
     df_ps_t = pd.DataFrame(ps_t).round(decimals=3)
 
     #store them as csv's
+    if not os.path.exists(folder_name+'psnr.csv'):
+        os.makedirs(folder_name+'psnr.csv')
+        os.makedirs(folder_name+'ps.csv')
+        os.makedirs(folder_name+'ps_t.csv')
     df_psnr.to_csv(folder_name+'psnr.csv', mode='a', index=False, header=False)
     df_ps.to_csv(folder_name+'ps.csv', mode='a', index=False, header=False)
     df_ps_t.to_csv(folder_name+'ps_t.csv', mode='a', index=False, header=False)
