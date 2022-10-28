@@ -1,11 +1,12 @@
-import matplotlib.pyplot as plt
 import os
 from torchvision import transforms
-from PIL import Image
 import pandas as pd
 from evaluate import PSNR, PS
 import torch
 import csv
+import numpy as np
+from scipy.stats import sem
+from scipy.stats import t
 
 '''
     Save the input image to a specified folder
@@ -91,4 +92,30 @@ def get_summary(folder):
         for line in data_summary:
             writer.writerow(line)
 
+def get_confidence(folder):
+    def get_confidence_interval(path, output):
+        file = csv.reader(open(path, 'r'))
+        row1 = next(file)
+        dataset = [[float(row1[i])] for i in range(len(row1))]
+        for row in file:
+            for i in range(len(row)):
+                dataset[i].append(float(row[i]))
+        intervals = []
+        for data in dataset:
+            intervals.append(calculate_confidence_interval(data))
+        output.append(intervals)
+    
+    output = []
+    get_confidence_interval(folder+'ps_t.csv', output)
+    get_confidence_interval(folder+'ps.csv', output)
+    get_confidence_interval(folder+'psnr.csv', output)
 
+    with open(folder+'confidence.csv', 'w') as file:
+        writer = csv.writer(file)
+        for line in output:
+            writer.writerow(line)
+
+def calculate_confidence_interval(data, confidence=0.95):
+    a, n = 1.0 * np.array(data), len(data)
+    interval = sem(a) * t.ppf((1+confidence)/2., n-1)
+    return round(interval,3)

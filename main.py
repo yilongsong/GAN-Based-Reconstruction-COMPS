@@ -9,7 +9,7 @@ from re import split
 from os import listdir, remove
 from os.path import isfile, join
 from model import run_model
-from visualizer import get_summary
+from visualizer import get_summary, get_confidence
 
 def parse_args():
     # parse command line args
@@ -118,7 +118,9 @@ def main():
             reset_weights(params['weights_path'])
             num_img_saved += 1
 
+    # record our results: first file is the average, second file is the confidence interval (95%)
     get_summary('/'+params['test_folder'])
+    get_confidence('/'+params['test_folder'])
 
 if __name__ == '__main__':
     main()
