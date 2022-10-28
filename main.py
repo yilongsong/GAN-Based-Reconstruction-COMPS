@@ -116,7 +116,7 @@ def main():
             reset_weights(params['weights_path'])
             num_img_saved += 1
 
-    get_summary(params['test_folder'])
+    get_summary('/'+params['test_folder'])
 
 if __name__ == '__main__':
     main()
