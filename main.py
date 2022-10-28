@@ -119,8 +119,8 @@ def main():
             num_img_saved += 1
 
     # record our results: first file is the average, second file is the confidence interval (95%)
-    get_summary(params['test_folder']+'/')
-    get_confidence('/'+params['test_folder']+'/')
+    get_summary(params['parent_path'])
+    get_confidence(params['parent_path'])
 
 if __name__ == '__main__':
     main()
