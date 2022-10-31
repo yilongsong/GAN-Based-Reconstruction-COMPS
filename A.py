@@ -24,12 +24,11 @@ class A():
 
     def render_mask(img, ratio):
         size = img.shape[2]
-        mask = torch.zeros((size, size))
-        a = torch.tensor(list(product(range(size), range(size))))
-        prob = torch.tensor([1/(size*size)]*size*size)
-        idx = prob.multinomial(num_samples=int(size*size*(1-ratio)), replacement=False)
-        for i in a[idx]:
-            mask[i[0], i[1]] = 1
+        mask = torch.zeros((size*size,))
+        mask[:int((1-ratio)*size*size)] = 1
+        ridx = torch.randperm(size*size)
+        mask = torch.reshape(mask[ridx], (size, size))
+        mask[0][0] = 1
         mask = mask.unsqueeze(0).unsqueeze(0).unsqueeze(4)
         return torch.cat((mask, mask), 4)
 
