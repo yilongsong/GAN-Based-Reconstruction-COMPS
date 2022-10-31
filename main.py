@@ -82,6 +82,8 @@ def get_test_folder(folder):
         return ['2','3','4','5','6','8','9','10','11']
     elif folder == 'Half':
         return [str(i) for i in range(0, 50)]
+    elif folder == 'Single':
+        return ['0']
 
 def reset_weights(weights_path):
     src_path = './saved_weights/' + weights_path
