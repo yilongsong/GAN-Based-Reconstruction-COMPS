@@ -98,8 +98,6 @@ class ImageAdaptiveGenerator():
             # print out each 10th iterations
             if (itr+1) % 100 == 0:
                 print(f"iteration {itr+1}, loss = {loss:.10f}")
-            if (itr+1) % 100 == 0:
-                saveImage(Gz, str(itr+1)+'_GAN_img', './Results/PGGAN/Bicubic_0N_16S_CSGM1800_IA300_Single/0')
 
         CSGM_img = self.G(self.z)
         print("CSGM completed")
