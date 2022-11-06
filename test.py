@@ -5,7 +5,7 @@ from re import search
 from torchvision import transforms
 from PIL import Image
 
-path = './Results/PGGAN/Bicubic_0N_8S_CSGM1800_IA300_Half/0/original_x.jpg'
+path = './100_IA_GAN_img.jpg'
 convert_to_tensor = transforms.ToTensor()
 x_PIL = Image.open(path)
 x = torch.unsqueeze(convert_to_tensor(x_PIL), 0)
