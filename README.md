@@ -11,7 +11,9 @@ Our work examines the image-adaptive generative model, proposed in (Hussein et a
 ## Usage
 To run our model , you can use the command line arguments as follows:
 
-``` !python main.py --GAN PGGAN --scale 32 --noise 40 --task Bicubic --csgm_itr 1800 --ia_itr 300 --test_folder Whole  --save_images ```
+``` 
+!python main.py --GAN PGGAN --scale 32 --noise 40 --task Bicubic --csgm_itr 1800 --ia_itr 300 --test_folder Whole  --save_images 
+```
 
 ## References
 Karras, Tero, Timo Aila, Samuli Laine, and Jaakko Lehtinen. "Progressive growing of gans for improved quality, stability, and variation." arXiv preprint arXiv:1710.10196 (2017).
