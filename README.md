@@ -8,12 +8,17 @@ Antonio, Yilong, and Daisuke (Fall 2022)
 
 Our work examines the image-adaptive generative model, proposed in (Hussein et al., 2020), that purports to mitigate problems caused by the limited representation capabilities of previous models in solving the image inverse problem. To this end, we implement the proposed model from (Hussein et al., 2020) and evaluate the robustness of their methodologies. Our results show that the two approaches, IA and BP, can effectively improve reconstructions. Particularly, the image adaptation technique (i.e., IA) is very effective in enhancing the generator’s capability to estimate the specific test sample. Further investigatin reveals slight biases in the model, which we conjecture to be caused by the training dataset for the PGGAN and thus able to be ameliorated by updating the dataset. Finally, to explore more efficient ways of running the model, we tested out our conjecture that the number of iterations used for CSGM can be lowered, and find that it indeed can be lowered to an extent without sacrificing model performance. However, future work can further explore the optimal number of iterations for IA. We conjecture that performing too many IA iterations will produce worse reconstructions, due to “overfitting” of the model, and hence hinder its ability to generate a realistic image of human faces.
 
+## Website and Paper
+Coming soon.
+
 ## Usage
 To run our model , you can use the command line arguments as follows:
 
 ``` 
-!python main.py --GAN PGGAN --scale 32 --noise 40 --task Bicubic --csgm_itr 1800 --ia_itr 300 --test_folder Whole  --save_images 
+!python main.py --GAN PGGAN --scale S --noise N --task T --csgm_itr CSGM --ia_itr IA --test_folder FOLDER  --save_images 
 ```
+
+where you replace S with scale, N with noise level, T with a task, CSGM with the number of iterations for CSGM, IA with the number of iterations for IA, and FOLDER with the set of images you want to run your experiment on. You can also use the Jupyter notebook to run our model.
 
 ## References
 Karras, Tero, Timo Aila, Samuli Laine, and Jaakko Lehtinen. "Progressive growing of gans for improved quality, stability, and variation." arXiv preprint arXiv:1710.10196 (2017).
