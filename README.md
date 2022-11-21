@@ -6,7 +6,21 @@ Antonio, Yilong, and Daisuke (Fall 2022)
 
 ## Description
 
-Our work examines the image-adaptive generative model, proposed in (Hussein et al., 2020), that purports to mitigate problems caused by the limited representation capabilities of previous models in solving the image inverse problem. To this end, we implement the proposed model from (Hussein et al., 2020) and evaluate the robustness of their methodologies. Our results show that the two approaches, IA and BP, can effectively improve reconstructions. Particularly, the image adaptation technique (i.e., IA) is very effective in enhancing the generator’s capability to estimate the specific test sample. Further investigatin reveals slight biases in the model, which we conjecture to be caused by the training dataset for the PGGAN and thus able to be ameliorated by updating the dataset. Finally, to explore more efficient ways of running the model, we tested out our conjecture that the number of iterations used for CSGM can be lowered, and find that it indeed can be lowered to an extent without sacrificing model performance. However, future work can further explore the optimal number of iterations for IA. We conjecture that performing too many IA iterations will produce worse reconstructions, due to “overfitting” of the model, and hence hinder its ability to generate a realistic image of human faces.
+The image inverse problem is the problem of reconstructing an image given its degraded 
+or compressed observation. Some previous solutions to this problem use generative adversarial 
+networks (GANs), but the representation capabilities of such models cannot capture the full 
+distribution of complex classes of images (e.g., human faces), thus producing sub-optimal results. 
+Our work examines the image-adaptive generative model, proposed in Hussein et al (2020), that 
+purports to mitigate the limited representation capabilities of previous models in solving the 
+image inverse problem. To this end, we implement the proposed model from Hussein et al (2020), 
+which makes generators "image-adpative" to a specific test sample. This model consists of three 
+successive optimization stages: the non-image-adaptive "compressed sensing using generative models" 
+(CSGM), the image-adaptive step (IA), and the post-processing "back-projection" (BP). Our results 
+demonstrate that the two image-adaptive approaches--IA and BP--can effectively improve reconstructions. 
+Further testing reveals slight biases existing in the model (e.g., skin tones), which we conjecture to 
+be caused by the training dataset on which the model is trained. Finally, to explore more efficient ways 
+of running the model, we test out different numbers of iterations used for CSGM. The results show that we 
+can indeed decrease the number of CSGM iterations without compromising reconstruction qualities. 
 
 ## Website and Paper
 Coming soon.
