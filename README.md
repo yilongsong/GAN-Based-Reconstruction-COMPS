@@ -13,7 +13,7 @@ distribution of complex classes of images (e.g., human faces), thus producing su
 Our work examines the image-adaptive generative model, proposed in Hussein et al (2020), that 
 purports to mitigate the limited representation capabilities of previous models in solving the 
 image inverse problem. To this end, we implement the proposed model from Hussein et al (2020), 
-which makes generators "image-adpative" to a specific test sample. This model consists of three 
+which makes generators "image-adaptive" to a specific test sample. This model consists of three 
 successive optimization stages: the non-image-adaptive "compressed sensing using generative models" 
 (CSGM), the image-adaptive step (IA), and the post-processing "back-projection" (BP). Our results 
 demonstrate that the two image-adaptive approaches--IA and BP--can effectively improve reconstructions. 
